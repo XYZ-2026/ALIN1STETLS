@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MHT-CET — Marks to Percentile Predictor</title>
+  <meta name="description"
+    content="Convert your MHT-CET marks to estimated percentile. Data will be updated as available.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root,
+    [data-theme="light"] {
+      --brand: #e6403a;
+      --brand-d: #c73430;
+      --brand-soft: #fff1f0;
+      --brand-ring: rgba(230, 64, 58, .18);
+      --ink: #111827;
+      --ink2: #374151;
+      --muted: #6b7280;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --stroke: #e5e7eb;
+      --ring: #dbeafe;
+      --row-hover: #f0f4ff;
+      --th: #f9fafb;
+      --inp: #ffffff;
+      --green-bg: #f0fdf4;
+      --green: #16a34a;
+      --orange-bg: #fff7ed;
+      --orange: #d97706;
+      --red-bg: #fff1f0;
+      --red: #e6403a;
+      --shadow: 0 4px 24px rgba(16, 24, 40, .07);
+      --shadow-lg: 0 12px 40px rgba(16, 24, 40, .10);
+      --bar: #ffffff
+    }
+
+    [data-theme="dark"] {
+      --brand: #ff6b65;
+      --brand-d: #e6403a;
+      --brand-soft: #3a1a18;
+      --brand-ring: rgba(255, 107, 101, .18);
+      --ink: #f3f4f6;
+      --ink2: #d1d5db;
+      --muted: #9ca3af;
+      --bg: #0d0f18;
+      --card: #161a28;
+      --stroke: #252a3d;
+      --ring: #1e3a5f;
+      --row-hover: #1e2438;
+      --th: #12151f;
+      --inp: #12151f;
+      --green-bg: #0a2015;
+      --green: #4ade80;
+      --orange-bg: #221408;
+      --orange: #fb923c;
+      --red-bg: #2a0e0e;
+      --red: #ff6b65;
+      --shadow: 0 4px 24px rgba(0, 0, 0, .30);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, .40);
+      --bar: #12151f
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+      min-height: 100vh
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--stroke);
+      border-radius: 3px
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--bar);
+      border-bottom: 1px solid var(--stroke)
+    }
+
+    .topbar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 62px;
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 14px var(--brand-ring)
+    }
+
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.2
+    }
+
+    .brand-name span {
+      display: block;
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: .5px;
+      text-transform: uppercase
+    }
+
+    .topbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: 1.5px solid var(--stroke);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all .15s;
+      font-family: 'DM Sans', sans-serif
+    }
+
+    .back-btn:hover {
+      background: var(--row-hover);
+      color: var(--ink);
+      border-color: var(--ink2)
+    }
+
+    .toggle-wrap {
+      position: relative;
+      width: 42px;
+      height: 22px;
+      flex-shrink: 0
+    }
+
+    .toggle-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--stroke);
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3px;
+      font-size: 9px;
+      transition: background .3s
+    }
+
+    [data-theme="dark"] .toggle-track {
+      background: #4f46e5
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+      transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+      pointer-events: none
+    }
+
+    .toggle-wrap input:checked~.toggle-knob {
+      transform: translateX(20px)
+    }
+
+    .wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 32px 20px 60px
+    }
+
+    .page-hero {
+      background: linear-gradient(135deg, #991b1b 0%, #e6403a 50%, #f97316 100%);
+      border-radius: 18px;
+      padding: 28px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .page-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 50%, rgba(255, 255, 255, .08) 0%, transparent 55%);
+      pointer-events: none
+    }
+
+    .page-hero h1 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: clamp(18px, 4vw, 24px);
+      color: #fff;
+      position: relative
+    }
+
+    .page-hero p {
+      color: rgba(255, 255, 255, .85);
+      font-size: 14px;
+      margin-top: 8px;
+      position: relative;
+      line-height: 1.6
+    }
+
+    .card {
+      background: var(--card);
+      border: 1.5px solid var(--stroke);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--shadow)
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--ink2);
+      display: block;
+      margin: 14px 0 6px;
+      font-size: 13.5px
+    }
+
+    label:first-child {
+      margin-top: 0
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--stroke);
+      background: var(--inp);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+      -webkit-appearance: none;
+      appearance: none
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px var(--ring)
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px
+    }
+
+    .help {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 13px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background .18s, transform .18s;
+      width: 100%;
+      margin-top: 20px
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--brand-ring)
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-d);
+      transform: translateY(-1px)
+    }
+
+    .result-card {
+      display: none;
+      margin-top: 24px;
+      background: var(--card);
+      border: 2px solid var(--brand);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      animation: fadeUp .4s ease
+    }
+
+    .result-card.show {
+      display: block
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    .result-value {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: clamp(32px, 8vw, 48px);
+      color: var(--brand);
+      line-height: 1
+    }
+
+    .result-range {
+      font-size: 14px;
+      color: var(--ink2);
+      margin-top: 8px;
+      font-weight: 500
+    }
+
+    .result-marks {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px
+    }
+
+    .rg-box {
+      background: var(--bg);
+      border: 1px solid var(--stroke);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center
+    }
+
+    .rg-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 3px
+    }
+
+    .rg-val {
+      font-size: 18px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: var(--ink)
+    }
+
+    .coming-soon {
+      margin-top: 24px;
+      background: var(--orange-bg);
+      border: 1.5px solid var(--orange);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center
+    }
+
+    .coming-soon h3 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--orange);
+      margin-bottom: 6px
+    }
+
+    .coming-soon p {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6
+    }
+
+    @media(max-width:640px) {
+      .wrap {
+        padding: 20px 14px 40px
+      }
+
+      .page-hero {
+        padding: 20px 18px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="home.html">
+        <div class="brand-logo">CT</div>
+        <div class="brand-name">MHT-CET<span>Marks → Percentile</span></div>
+      </a>
+      <div class="topbar-right">
+        <div id="authArea"></div>
+        <a class="back-btn" href="home.html">← Back to Hub</a>
+        <label class="toggle-wrap" title="Toggle dark mode">
+          <input type="checkbox" id="themeToggle">
+          <div class="toggle-track"><span>☀</span><span>🌙</span></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="page-hero">
+      <h1>📐 MHT-CET — Marks vs Percentile</h1>
+      <p>Enter your MHT-CET marks to get an estimated percentile score. Select the difficulty level of your paper for
+        better accuracy.</p>
+    </div>
+
+    <div id="toolArea">
+      <div class="card" id="toolCard">
+        <label for="inMarks">MHT-CET Marks (out of 200)</label>
+        <input type="number" id="inMarks" placeholder="e.g. 135" min="0" max="200" step="1">
+        <div class="help">Enter your total CET score out of 200</div>
+
+        <label for="inDifficulty">Paper Difficulty</label>
+        <select id="inDifficulty">
+          <option value="" disabled selected>Select difficulty level</option>
+          <option value="easy">Easy</option>
+          <option value="moderate">Moderate</option>
+          <option value="difficult">Difficult</option>
+        </select>
+        <div class="help">Choose the perceived difficulty of your paper</div>
+
+        <button class="btn btn-primary" onclick="predict()">📐 Predict Percentile</button>
+      </div>
+
+      <div class="result-card" id="resultCard">
+        <div class="result-label">Estimated Percentile</div>
+        <div class="result-value" id="resPercentile">—</div>
+        <div class="result-range" id="resRange"></div>
+        <div class="result-grid">
+          <div class="rg-box">
+            <div class="rg-label">Marks Entered</div>
+            <div class="rg-val" id="rgMarks">—</div>
+          </div>
+          <div class="rg-box">
+            <div class="rg-label">Difficulty</div>
+            <div class="rg-val" id="rgDiff" style="font-size:13px">—</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="shared_auth.js"></script>
+  <script>
+    if (initAuth({ requireLogin: true, toolContainerId: 'toolArea' })) {
+
+      var CET_DATA = [];
+
+      // Load real data from JSON file on page load
+      fetch('MHT CET marks vs percentile.json')
+        .then(function (r) { return r.json(); })
+        .then(function (json) {
+          var rows = json["MHT CET marks vs percentile"];
+          CET_DATA = rows.map(function (row) {
+            // Parse "165-170" → { min:165, max:170 }
+            var parts = row["Marks"].split('-');
+            var min = parseFloat(parts[0]);
+            var max = parseFloat(parts[1]);
+
+            // Parse percentile: "99.99+" or "99.96 - 99.98+"
+            var pStr = row["Percentile (%)"].replace(/\+/g, '').trim();
+            var pParts = pStr.split('-').map(function (s) { return parseFloat(s.trim()); });
+            var low = pParts[0];
+            var high = pParts.length > 1 ? pParts[1] : pParts[0];
+
+            return { min: min, max: max, low: low, high: high };
+          });
+        })
+        .catch(function () {
+          console.warn('Could not load CET data JSON. Check file path/name.');
+        });
+
+      function estimateCetPercentile(marks, difficulty) {
+        // Find matching row in real data
+        var row = null;
+        for (var i = 0; i < CET_DATA.length; i++) {
+          if (marks >= CET_DATA[i].min && marks <= CET_DATA[i].max) {
+            row = CET_DATA[i]; break;
+          }
+        }
+
+        var base;
+        if (row) {
+          base = (row.low + row.high) / 2; // midpoint of the real range
+        } else {
+          // Fallback for marks below available data
+          base = (marks / 200) * 85;
+        }
+
+        // Small difficulty nudge (±0.5)
+        if (difficulty === 'easy') base = Math.max(base - 0.5, 0);
+        if (difficulty === 'difficult') base = Math.min(base + 0.5, 99.99);
+
+        return Math.min(99.99, Math.max(0.01, base));
+      }
+
+      function predict() {
+        if (CET_DATA.length === 0) {
+          alert('Data is still loading. Please wait a moment and try again.');
+          return;
+        }
+
+        var marks = parseFloat(document.getElementById('inMarks').value);
+        var diff = document.getElementById('inDifficulty').value;
+        if (isNaN(marks) || marks < 0 || marks > 200) { alert('Please enter valid marks (0–200).'); return; }
+        if (!diff) { alert('Please select a difficulty level.'); return; }
+
+        var pct = estimateCetPercentile(marks, diff);
+
+        // Show real low–high range from data if available
+        var matchedRow = null;
+        for (var i = 0; i < CET_DATA.length; i++) {
+          if (marks >= CET_DATA[i].min && marks <= CET_DATA[i].max) {
+            matchedRow = CET_DATA[i]; break;
+          }
+        }
+        var low = matchedRow ? matchedRow.low.toFixed(2) : Math.max(0, pct - 2).toFixed(2);
+        var high = matchedRow ? matchedRow.high.toFixed(2) : Math.min(99.99, pct + 2).toFixed(2);
+
+        document.getElementById('resPercentile').textContent = pct.toFixed(2) + '%';
+        document.getElementById('resRange').textContent = 'Expected range: ' + low + ' — ' + high + ' percentile';
+        document.getElementById('rgMarks').textContent = marks + '/200';
+        var labels = { easy: 'Easy', moderate: 'Moderate', difficult: 'Difficult' };
+        document.getElementById('rgDiff').textContent = labels[diff] || diff;
+
+        var rc = document.getElementById('resultCard');
+        rc.classList.remove('show'); void rc.offsetWidth; rc.classList.add('show');
+      }
+
+    } // end initAuth
+  </script>
+</body>
+
+</html>

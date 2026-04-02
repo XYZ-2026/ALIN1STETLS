@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOSAA Cutoff Checker | College Simplified</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+     RESET & VARIABLES
+     ═══════════════════════════════════════════════════════════════ */
+    :root,
+    [data-theme="light"] {
+      --brand: #e6403a;
+      --brand-d: #c73430;
+      --brand-soft: #fff1f0;
+      --brand-ring: rgba(230, 64, 58, .18);
+      --ink: #111827;
+      --ink2: #374151;
+      --muted: #6b7280;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --stroke: #e5e7eb;
+      --ring: #dbeafe;
+      --row-hover: #f0f4ff;
+      --th: #f9fafb;
+      --inp: #ffffff;
+      --shadow: 0 4px 24px rgba(16, 24, 40, .07);
+      --shadow-lg: 0 12px 40px rgba(16, 24, 40, .10);
+      --bar: #ffffff;
+    }
+
+    [data-theme="dark"] {
+      --brand: #ff6b65;
+      --brand-d: #e6403a;
+      --brand-soft: #3a1a18;
+      --brand-ring: rgba(255, 107, 101, .18);
+      --ink: #f3f4f6;
+      --ink2: #d1d5db;
+      --muted: #9ca3af;
+      --bg: #0d0f18;
+      --card: #161a28;
+      --stroke: #252a3d;
+      --ring: #1e3a5f;
+      --row-hover: #1e2438;
+      --th: #12151f;
+      --inp: #12151f;
+      --shadow: 0 4px 24px rgba(0, 0, 0, .30);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, .40);
+      --bar: #12151f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background .25s, color .25s;
+      min-width: 0;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--stroke);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     TOPBAR
+     ═══════════════════════════════════════════════════════════════ */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--bar);
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .topbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 16px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 14px var(--brand-ring);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+
+    .brand-name span {
+      display: block;
+      font-size: 9px;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Theme Toggle */
+    .toggle-wrap {
+      position: relative;
+      width: 42px;
+      height: 22px;
+      flex-shrink: 0;
+    }
+
+    .toggle-wrap input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--stroke);
+      border-radius: 999px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3px;
+      font-size: 9px;
+      transition: background .3s;
+    }
+
+    [data-theme="dark"] .toggle-track {
+      background: #4f46e5;
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+      transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+      pointer-events: none;
+    }
+
+    .toggle-wrap input:checked~.toggle-knob {
+      transform: translateX(20px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     BUTTONS
+     ═══════════════════════════════════════════════════════════════ */
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background .18s, transform .18s;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--brand-ring);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-d);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--stroke);
+    }
+
+    .btn-ghost:hover {
+      background: var(--row-hover);
+      color: var(--ink);
+    }
+
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .btn-xs {
+      padding: 5px 9px;
+      font-size: 12px;
+      border-radius: 7px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     LAYOUT
+     ═══════════════════════════════════════════════════════════════ */
+    .wrap-md {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════ */
+    .hero-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #fff;
+      border: none;
+      position: relative;
+    }
+
+    .hero-decor-wrap {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border-radius: 16px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(20px, 5vw, 28px);
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hero-text {
+      opacity: 0.9;
+      font-size: clamp(13px, 4vw, 15px);
+      margin-bottom: 24px;
+      max-width: 500px;
+      line-height: 1.5;
+    }
+
+    .hero-decoration {
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 150px;
+      height: 150px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     SEARCH BOX
+     ═══════════════════════════════════════════════════════════════ */
+    .search-outer {
+      position: relative;
+      margin-top: 0;
+      z-index: 100;
+      max-width: 100%;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 2px 12px;
+      transition: all 0.2s;
+      gap: 8px;
+    }
+
+    .search-box:focus-within {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      color: #fff;
+      padding: 12px 8px;
+      font-size: clamp(13px, 4vw, 15px);
+      width: 100%;
+      outline: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .search-icon {
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.6);
+      flex-shrink: 0;
+    }
+
+    .clear-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: none;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     SUGGESTIONS DROPDOWN
+     ═══════════════════════════════════════════════════════════════ */
+    .sugg-drop {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      max-height: 320px;
+      overflow-y: auto;
+      z-index: 999;
+      display: none;
+    }
+
+    .sugg-drop.open {
+      display: block;
+    }
+
+    .sugg-row {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--stroke);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.15s;
+    }
+
+    .sugg-row:last-child {
+      border-bottom: none;
+    }
+
+    .sugg-row:hover,
+    .sugg-row.hl {
+      background: var(--row-hover);
+    }
+
+    .sugg-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .sugg-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sugg-name {
+      font-weight: 600;
+      font-size: 13.5px;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .sugg-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     FILTERS SECTION
+     ═══════════════════════════════════════════════════════════════ */
+    .filters-section {
+      display: none;
+    }
+
+    .filters-section.show {
+      display: block;
+    }
+
+    .filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .filters-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .sp-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .filters-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label {
+      font-weight: 600;
+      color: var(--ink2);
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .filter-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--stroke);
+      background: var(--inp);
+      border-radius: 10px;
+      font-size: 14px;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border .2s, box-shadow .2s;
+      cursor: pointer;
+    }
+
+    .filter-group select:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     RESULTS AREA
+     ═══════════════════════════════════════════════════════════════ */
+    .loader-pg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 240px;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid var(--stroke);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loader-emoji {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .loader-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .loader-text {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     CUTOFF CARDS GRID
+     ═══════════════════════════════════════════════════════════════ */
+    .cutoff-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .cutoff-card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border-left: 4px solid var(--brand);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    @keyframes cardIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cutoff-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      line-height: 1.4;
+      color: var(--ink);
+      flex: 1;
+    }
+
+    .card-tag {
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .card-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .p-chip {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--th);
+      color: var(--muted);
+    }
+
+    .p-chip.blue {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .card-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .s-box {
+      background: var(--bg);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      text-align: center;
+    }
+
+    .s-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .s-val {
+      font-size: clamp(14px, 4vw, 18px);
+      font-weight: 800;
+      color: var(--brand);
+    }
+
+    .no-results-text {
+      color: var(--muted);
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+     RESPONSIVE DESIGN
+     ═══════════════════════════════════════════════════════════════ */
+
+    /* Tablet: 768px */
+    @media (max-width: 768px) {
+      .wrap-md {
+        padding: 16px 14px 50px;
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 14px;
+      }
+
+      .topbar-inner {
+        padding: 0 12px;
+      }
+
+      .hero-title {
+        font-size: clamp(18px, 5vw, 24px);
+        margin-bottom: 6px;
+      }
+
+      .hero-text {
+        font-size: clamp(12px, 3.5vw, 14px);
+        margin-bottom: 18px;
+      }
+
+      .filters-bar {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+
+      .filters-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats-row {
+        width: 100%;
+      }
+
+      .cutoff-grid {
+        grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+        gap: 12px;
+      }
+
+      .card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .card-tag {
+        align-self: flex-start;
+      }
+
+      .card-stats {
+        gap: 8px;
+      }
+
+      .s-box {
+        padding: 10px;
+      }
+
+      .s-val {
+        font-size: clamp(13px, 3.5vw, 16px);
+      }
+    }
+
+    /* Mobile: 480px and below */
+    @media (max-width: 480px) {
+      .wrap-md {
+        padding: 12px 12px 40px;
+      }
+
+      .card {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+      }
+
+      .topbar-inner {
+        padding: 0 10px;
+        height: 56px;
+      }
+
+      .brand-name {
+        font-size: 12px;
+      }
+
+      .brand-logo {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+      }
+
+      .hero-title {
+        font-size: clamp(16px, 6vw, 20px);
+        margin-bottom: 4px;
+      }
+
+      .hero-text {
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+
+      .search-box {
+        padding: 2px 10px;
+      }
+
+      .search-box input {
+        padding: 10px 6px;
+        font-size: 14px;
+      }
+
+      .search-icon {
+        font-size: 16px;
+      }
+
+      .filters-bar {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .filter-group label {
+        font-size: 12px;
+        margin-bottom: 5px;
+      }
+
+      .filter-group select {
+        padding: 9px 10px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+
+      .cutoff-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .cutoff-card {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .card-pills {
+        gap: 5px;
+        margin-bottom: 12px;
+      }
+
+      .p-chip {
+        font-size: 10px;
+        padding: 3px 8px;
+      }
+
+      .card-stats {
+        gap: 8px;
+      }
+
+      .s-box {
+        padding: 10px;
+      }
+
+      .s-lbl {
+        font-size: 9px;
+        margin-bottom: 4px;
+      }
+
+      .s-val {
+        font-size: 14px;
+      }
+
+      .loader-emoji {
+        font-size: 40px;
+        margin-bottom: 10px;
+      }
+
+      .loader-title {
+        font-size: 14px;
+      }
+
+      .loader-text {
+        font-size: 12px;
+      }
+
+      .btn-sm {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .btn-ghost {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+    }
+
+    /* Small mobile: 360px and below */
+    @media (max-width: 360px) {
+      .topbar-inner {
+        gap: 8px;
+      }
+
+      .brand-name {
+        display: none;
+      }
+
+      .topbar-right {
+        gap: 6px;
+      }
+
+      .search-box input::placeholder {
+        font-size: 12px;
+      }
+
+      .cutoff-grid {
+        gap: 8px;
+      }
+
+      .cutoff-card {
+        padding: 14px;
+      }
+
+      .card-title {
+        font-size: 12px;
+      }
+
+      .card-tag {
+        font-size: 9px;
+        padding: 3px 8px;
+      }
+
+      .p-chip {
+        font-size: 9px;
+        padding: 2px 6px;
+      }
+
+      .s-val {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="home.html">
+        <div class="brand-logo">CS</div>
+        <div class="brand-name">College Simplified<span>JOSAA Cutoffs</span></div>
+      </a>
+      <div class="topbar-right">
+        <div id="authArea"></div>
+        <button class="btn btn-ghost btn-sm" onclick="location.href='home.html'">← Hub</button>
+        <label class="toggle-wrap" title="Toggle dark mode">
+          <input type="checkbox" id="themeToggle">
+          <div class="toggle-track"><span>☀️</span><span>🌙</span></div>
+          <div class="toggle-knob"></div>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap-md">
+    <div id="toolArea">
+      <!-- Hero Section -->
+      <div class="card hero-card">
+        <div class="hero-content">
+          <h1 class="hero-title">JOSAA Cutoff Checker</h1>
+          <p class="hero-text">Search opening and closing ranks for IITs, NITs, and IIITs across India. Updated with
+            latest rounds.</p>
+
+          <div class="search-outer" id="searchOuter">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="Search Institute (e.g. NIT Trichy)..."
+                oninput="onSearch()" onkeydown="onSearchKey(event)" autocomplete="off">
+              <button class="btn btn-xs clear-btn" id="clearBtn" onclick="clearSearch()" style="display:none">✕</button>
+            </div>
+            <div class="sugg-drop" id="suggDrop"></div>
+          </div>
+        </div>
+        <div class="hero-decor-wrap">
+          <div class="hero-decoration"></div>
+        </div>
+      </div>
+
+      <!-- Filters Section -->
+      <div id="filtersSection" class="card filters-section">
+        <div class="filters-header">
+          <h2 class="filters-title">Refine Results</h2>
+          <div class="stats-row" id="statsRow"></div>
+        </div>
+        <div class="filters-bar">
+          <div class="filter-group">
+            <label>Seat Type</label>
+            <select id="filterCat" onchange="renderResults()">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Gender</label>
+            <select id="filterGender" onchange="renderResults()">
+              <option value="">All Genders</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Quota</label>
+            <select id="filterQuota" onchange="renderResults()">
+              <option value="">All Quotas</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Branch / Program</label>
+            <select id="filterBranch" onchange="renderResults()">
+              <option value="">All Branches</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Area -->
+      <div id="resultsArea">
+        <div class="loader-pg" style="min-height: 300px">
+          <div class="spinner"></div>
+          <p class="loader-text">Initializing application...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared_auth.js"></script>
+  <script>
+    'use strict';
+
+    var JOSAA_DATA = [];
+    var ALL_COLLEGES = [];
+    var SEL_COLLEGE = null;
+    var CUR_ROWS = [];
+    var SUGG_MATCHES = [];
+    var HL_IDX = -1;
+
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function fR(n) { return (parseInt(n) || 0).toLocaleString('en-IN'); }
+
+    // Load data execution
+    async function startApp() {
+      const resArea = document.getElementById('resultsArea');
+      if (!resArea) return;
+      resArea.innerHTML = '<div class="loader-pg"><div class="spinner"></div><p class="loader-text">Loading application data...</p></div>';
+      try {
+        const res = await fetch('josaa.json');
+        if (!res.ok) throw new Error('Data file not found or server error');
+        const json = await res.json();
+        JOSAA_DATA = json['JOSAA DATA'] || [];
+        const seen = {};
+        JOSAA_DATA.forEach(function (r) {
+          if (r.Institute) r.Institute = r.Institute.trim();
+          var n = r.Institute;
+          if (n && !seen[n.toLowerCase()]) { seen[n.toLowerCase()] = true; ALL_COLLEGES.push(n); }
+        });
+        ALL_COLLEGES.sort();
+        resArea.innerHTML = '<div class="loader-pg" style="min-height:200px"><div class="loader-emoji">🏛️</div><h3 class="loader-title">Search a college to begin</h3><p class="loader-text">Type at least 2 characters of a college name above.</p></div>';
+      } catch (e) {
+        console.error("JOSAA Load Error:", e);
+        resArea.innerHTML = '<div class="loader-pg" style="min-height:200px"><div class="loader-emoji">❌</div><h3 class="loader-title">Failed to load data</h3><p class="loader-text">' + esc(e.message) + '</p><button class="btn btn-primary btn-sm" onclick="location.reload()" style="margin-top:10px">Retry</button></div>';
+      }
+    }
+
+    if (initAuth({ requireLogin: true, toolContainerId: 'toolArea' })) {
+      startApp();
+    }
+
+    // Global functions accessible from HTML
+    function onSearch() {
+      var q = (document.getElementById('searchInput').value || '').trim();
+      document.getElementById('clearBtn').style.display = q ? 'block' : 'none';
+      if (!q) { hideSugg(); if (SEL_COLLEGE) resetResults(); return; }
+      if (SEL_COLLEGE && q.toLowerCase() !== SEL_COLLEGE.toLowerCase()) { SEL_COLLEGE = null; document.getElementById('filtersSection').classList.remove('show'); document.getElementById('statsRow').innerHTML = ''; }
+      if (q.length < 2) { hideSugg(); return; }
+      showSugg(q);
+    }
+
+    function showSugg(q) {
+      var lower = q.toLowerCase();
+      var starts = ALL_COLLEGES.filter(function (n) { return n.toLowerCase().startsWith(lower); });
+      var rest = ALL_COLLEGES.filter(function (n) { return !n.toLowerCase().startsWith(lower) && n.toLowerCase().includes(lower); });
+      var matches = starts.concat(rest).slice(0, 12);
+      SUGG_MATCHES = matches; HL_IDX = -1;
+      var drop = document.getElementById('suggDrop');
+      if (!matches.length) { drop.classList.remove('open'); return; }
+      var re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+      drop.innerHTML = matches.map(function (n, i) {
+        var hi = esc(n).replace(re, '<mark style="background:rgba(255,255,255,0.3);padding:0 2px">$1</mark>');
+        var safeName = n.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return '<div class="sugg-row" data-idx="' + i + '" onmousedown="pickCollege(\'' + safeName + '\')">' +
+          '<span class="sugg-icon">🏛️</span>' +
+          '<div class="sugg-text"><div class="sugg-name">' + hi + '</div><div class="sugg-meta">JOSAA Institute</div></div></div>';
+      }).join('');
+      drop.classList.add('open');
+    }
+
+    function hideSugg() { document.getElementById('suggDrop').classList.remove('open'); HL_IDX = -1; }
+
+    function onSearchKey(e) {
+      var drop = document.getElementById('suggDrop');
+      if (e.key === 'Escape') { hideSugg(); return; }
+      var rows = drop.querySelectorAll('.sugg-row');
+      if (e.key === 'ArrowDown') { e.preventDefault(); HL_IDX = Math.min(HL_IDX + 1, rows.length - 1); hlRow(rows); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); HL_IDX = Math.max(HL_IDX - 1, -1); hlRow(rows); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (HL_IDX >= 0 && SUGG_MATCHES[HL_IDX]) pickCollege(SUGG_MATCHES[HL_IDX]); else if (SUGG_MATCHES.length > 0) pickCollege(SUGG_MATCHES[0]); }
+    }
+    function hlRow(rows) { rows.forEach(function (r, i) { r.classList.toggle('hl', i === HL_IDX); }); }
+
+    function pickCollege(name) {
+      SEL_COLLEGE = name;
+      document.getElementById('searchInput').value = name;
+      document.getElementById('clearBtn').style.display = 'block';
+      hideSugg();
+      loadCollege(name);
+    }
+
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clearBtn').style.display = 'none';
+      hideSugg(); resetResults();
+    }
+
+    function resetResults() {
+      SEL_COLLEGE = null; CUR_ROWS = [];
+      var fs = document.getElementById('filtersSection');
+      if (fs) fs.classList.remove('show');
+      var sr = document.getElementById('statsRow');
+      if (sr) sr.innerHTML = '';
+      var ra = document.getElementById('resultsArea');
+      if (ra) ra.innerHTML = '<div class="loader-pg" style="min-height:240px"><div class="loader-emoji">🏛️</div><h3 class="loader-title">Search a college to begin</h3><p class="loader-text">Type at least 2 characters of a college name above.</p></div>';
+    }
+
+    document.addEventListener('click', function (e) { if (!e.target.closest('#searchOuter')) hideSugg(); });
+
+    function loadCollege(name) {
+      if (!name) return;
+      var lower = name.trim().toLowerCase();
+      CUR_ROWS = JOSAA_DATA.filter(function (r) {
+        return (r.Institute || '').trim().toLowerCase() === lower;
+      });
+      buildFilters();
+      renderResults();
+    }
+
+    function buildFilters() {
+      var cats = {}, genders = {}, quotas = {}, branches = {};
+      CUR_ROWS.forEach(function (r) {
+        if (r['Seat Type']) cats[r['Seat Type']] = 1;
+        if (r['Gender']) genders[r['Gender']] = 1;
+        if (r['Quota']) quotas[r['Quota']] = 1;
+        if (r['Academic Program Name']) branches[r['Academic Program Name']] = 1;
+      });
+      document.getElementById('filterCat').innerHTML = '<option value="">All Categories</option>' + Object.keys(cats).sort().map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+      document.getElementById('filterGender').innerHTML = '<option value="">All Genders</option>' + Object.keys(genders).sort().map(function (g) { return '<option value="' + esc(g) + '">' + esc(g) + '</option>'; }).join('');
+      document.getElementById('filterQuota').innerHTML = '<option value="">All Quotas</option>' + Object.keys(quotas).sort().map(function (q) { return '<option value="' + esc(q) + '">' + esc(q) + '</option>'; }).join('');
+      document.getElementById('filterBranch').innerHTML = '<option value="">All Branches</option>' + Object.keys(branches).sort().map(function (b) { return '<option value="' + esc(b) + '">' + esc(b) + '</option>'; }).join('');
+      document.getElementById('filterCat').value = '';
+      document.getElementById('filterGender').value = '';
+      document.getElementById('filterQuota').value = '';
+      document.getElementById('filterBranch').value = '';
+      document.getElementById('filtersSection').classList.add('show');
+    }
+
+    function renderResults() {
+      var catF = document.getElementById('filterCat').value;
+      var genF = document.getElementById('filterGender').value;
+      var quoF = document.getElementById('filterQuota').value;
+      var brF = document.getElementById('filterBranch').value;
+
+      var filtered = CUR_ROWS.filter(function (r) {
+        if (catF && r['Seat Type'] !== catF) return false;
+        if (genF && r['Gender'] !== genF) return false;
+        if (quoF && r['Quota'] !== quoF) return false;
+        if (brF && r['Academic Program Name'] !== brF) return false;
+        return true;
+      });
+
+      filtered.sort(function (a, b) { return (parseInt(a['Opening Rank']) || 0) - (parseInt(b['Opening Rank']) || 0); });
+
+      var sr = document.getElementById('statsRow');
+      sr.innerHTML = filtered.length
+        ? '<div class="stat-pill"><span class="sp-dot" style="background:var(--brand)"></span>' + filtered.length + ' Programs Found</div>'
+        : '';
+
+      if (!filtered.length) {
+        document.getElementById('resultsArea').innerHTML = '<div class="loader-pg" style="min-height:240px"><div class="loader-emoji">🔍</div><h3 class="loader-title">No results found</h3><p class="loader-text">Try adjusting your filters.</p></div>';
+        return;
+      }
+
+      var html = '<div class="cutoff-grid">';
+      filtered.slice(0, 100).forEach(function (r, i) {
+        var opening = parseInt(r['Opening Rank']) || 0;
+        var closing = parseInt(r['Closing Rank']) || 0;
+        var gen = r.Gender === 'Gender-Neutral' ? 'GN' : (r.Gender || 'NA');
+
+        html += '<div class="cutoff-card" style="animation: cardIn 0.3s ease forwards; animation-delay:' + (i * 0.02) + 's">';
+        html += '<div class="card-top"><div class="card-title">' + esc(r['Academic Program Name']) + '</div><div class="card-tag">JOSAA</div></div>';
+        html += '<div class="card-pills">';
+        html += '<span class="p-chip blue">' + esc(r['Seat Type']) + '</span>';
+        html += '<span class="p-chip">' + esc(gen) + '</span>';
+        html += '<span class="p-chip">' + esc(r['Quota']) + '</span>';
+        html += '</div>';
+        html += '<div class="card-stats">';
+        html += '<div class="s-box"><div class="s-lbl">Opening</div><div class="s-val">' + fR(opening) + '</div></div>';
+        html += '<div class="s-box"><div class="s-lbl">Closing</div><div class="s-val">' + fR(closing) + '</div></div>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+      if (filtered.length > 100) html += '<p class="no-results-text">Showing top 100. Use filters to narrow down.</p>';
+      document.getElementById('resultsArea').innerHTML = html;
+    }
+  </script>
+</body>
+
+</html>

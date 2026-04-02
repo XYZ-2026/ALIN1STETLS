@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MHT-CET AI Seat Eligibility Checker — All India Seats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ─────────────────────────────────────────
+   TOKENS
+───────────────────────────────────────── */
+        :root {
+            --brand: #e63946;
+            --brand-d: #c1121f;
+            --brand-soft: #fff0f1;
+            --brand-ring: rgba(230, 57, 70, .15);
+            --ink: #0f1117;
+            --ink2: #2d3240;
+            --muted: #6c7389;
+            --bg: #f5f6fa;
+            --card: #ffffff;
+            --stroke: #e4e6ef;
+            --stroke2: #d0d3e2;
+            --row-hover: #f0f2fa;
+            --th: #f8f9fc;
+            --inp: #ffffff;
+            --green: #16a34a;
+            --green-bg: #f0fdf4;
+            --green-b: rgba(22, 163, 74, .25);
+            --yellow: #b45309;
+            --yellow-bg: #fefce8;
+            --yellow-b: rgba(180, 83, 9, .25);
+            --orange: #c2410c;
+            --orange-bg: #fff7ed;
+            --orange-b: rgba(194, 65, 12, .25);
+            --blue: #2563eb;
+            --blue-bg: #eff6ff;
+            --chip-bg: #eef2ff;
+            --chip: #3b5bdb;
+            --shadow: 0 2px 16px rgba(15, 17, 23, .07);
+            --shadow-lg: 0 8px 32px rgba(15, 17, 23, .10);
+            --r: 14px;
+            --mono: 'DM Mono', monospace;
+            --bar: #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --brand: #ff6b74;
+            --brand-d: #e63946;
+            --brand-soft: #2a1215;
+            --brand-ring: rgba(255, 107, 116, .15);
+            --ink: #f0f1f6;
+            --ink2: #c8cad8;
+            --muted: #8b90a8;
+            --bg: #0b0d14;
+            --card: #131620;
+            --stroke: #222636;
+            --stroke2: #2a2f45;
+            --row-hover: #1a1e2e;
+            --th: #0f1219;
+            --inp: #0f1219;
+            --green: #4ade80;
+            --green-bg: #0a1f10;
+            --green-b: rgba(74, 222, 128, .25);
+            --yellow: #fbbf24;
+            --yellow-bg: #1c1408;
+            --yellow-b: rgba(251, 191, 36, .25);
+            --orange: #fb923c;
+            --orange-bg: #1f1208;
+            --orange-b: rgba(251, 146, 60, .25);
+            --blue: #60a5fa;
+            --blue-bg: #0e1a38;
+            --chip-bg: #1a2150;
+            --chip: #94b4ff;
+            --shadow: 0 2px 16px rgba(0, 0, 0, .3);
+            --shadow-lg: 0 8px 36px rgba(0, 0, 0, .45);
+            --bar: #0f1219;
+        }
+
+        /* ─────────────────────────────────────────
+   RESET + BASE
+───────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background .25s, color .25s
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--stroke2);
+            border-radius: 3px
+        }
+
+        /* ─────────────────────────────────────────
+   TOPBAR
+───────────────────────────────────────── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: var(--bar);
+            border-bottom: 1px solid var(--stroke)
+        }
+
+        .topbar-inner {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 0 22px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: var(--brand);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 4px 14px var(--brand-ring);
+            flex-shrink: 0
+        }
+
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--ink);
+            line-height: 1.15
+        }
+
+        .brand-name span {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            font-family: 'Outfit', sans-serif;
+            margin-top: 1px
+        }
+
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .badge-pill {
+            background: var(--brand-soft);
+            border: 1px solid rgba(230, 57, 70, .2);
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--brand);
+            letter-spacing: .3px
+        }
+
+        /* Dark toggle */
+        .tgl {
+            position: relative;
+            width: 44px;
+            height: 23px;
+            flex-shrink: 0;
+            cursor: pointer
+        }
+
+        .tgl input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute
+        }
+
+        .tgl-track {
+            position: absolute;
+            inset: 0;
+            background: var(--stroke2);
+            border-radius: 999px;
+            transition: background .3s;
+            display: flex;
+            align-items: center;
+            padding: 0 3px
+        }
+
+        [data-theme="dark"] .tgl-track {
+            background: #4f46e5
+        }
+
+        .tgl-knob {
+            position: absolute;
+            top: 2.5px;
+            left: 2.5px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .25);
+            transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+            pointer-events: none
+        }
+
+        .tgl input:checked~.tgl-knob {
+            transform: translateX(21px)
+        }
+
+        .tgl-ico {
+            font-size: 9px;
+            z-index: 1;
+            line-height: 1
+        }
+
+        /* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+        .wrap {
+            max-width: 1160px;
+            margin: 0 auto;
+            padding: 36px 22px 90px
+        }
+
+        /* ─────────────────────────────────────────
+   HERO BANNER
+───────────────────────────────────────── */
+        .hero-banner {
+            background: linear-gradient(135deg, var(--brand) 0%, #9b1c1c 100%);
+            border-radius: 20px;
+            padding: 32px 32px 28px;
+            margin-bottom: 28px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: radial-gradient(circle at 85% 40%, rgba(255, 255, 255, .08) 0%, transparent 55%);
+            pointer-events: none
+        }
+
+        .hero-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, .06);
+            pointer-events: none
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(255, 255, 255, .15);
+            border: 1px solid rgba(255, 255, 255, .25);
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 14px
+        }
+
+        .hero-eyebrow .live-dot {
+            width: 7px;
+            height: 7px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+
+            50% {
+                opacity: .6;
+                transform: scale(.75)
+            }
+        }
+
+        .hero-banner h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: clamp(22px, 4vw, 34px);
+            line-height: 1.15;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -.5px;
+            position: relative
+        }
+
+        .hero-banner p {
+            opacity: .88;
+            font-size: 14px;
+            line-height: 1.65;
+            max-width: 600px;
+            position: relative
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+            position: relative
+        }
+
+        .hstat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px
+        }
+
+        .hstat-val {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: #fff;
+            line-height: 1
+        }
+
+        .hstat-lbl {
+            font-size: 11px;
+            opacity: .75;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+            font-weight: 500
+        }
+
+        /* ─────────────────────────────────────────
+   SEARCH CARD
+───────────────────────────────────────── */
+        .search-card {
+            background: var(--card);
+            border: 1.5px solid var(--stroke);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px
+        }
+
+        .sc-title {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--ink);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .sc-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 22px;
+            line-height: 1.5
+        }
+
+        /* Mode pills */
+        .mode-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 22px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+            width: fit-content;
+            border: 1.5px solid var(--stroke)
+        }
+
+        .mode-tab {
+            padding: 7px 18px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all .18s;
+            border: none;
+            background: none;
+            font-family: 'Outfit', sans-serif
+        }
+
+        .mode-tab.active {
+            background: var(--card);
+            color: var(--ink);
+            border: 1.5px solid var(--stroke2);
+            box-shadow: var(--shadow)
+        }
+
+        /* Score row */
+        .score-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px
+        }
+
+        @media(max-width:560px) {
+            .score-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .field label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--muted);
+            margin-bottom: 6px
+        }
+
+        .field input {
+            width: 100%;
+            background: var(--inp);
+            border: 1.5px solid var(--stroke2);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 16px;
+            font-family: var(--mono);
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none
+        }
+
+        .field input::placeholder {
+            color: var(--muted);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 400
+        }
+
+        .field input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .2)
+        }
+
+        .field-hint {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 5px
+        }
+
+        /* Filter grid */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 22px
+        }
+
+        @media(max-width:720px) {
+            .filter-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        @media(max-width:480px) {
+            .filter-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .fld-sel {
+            width: 100%;
+            background: var(--inp);
+            border: 1.5px solid var(--stroke2);
+            border-radius: 10px;
+            padding: 11px 36px 11px 13px;
+            font-size: 13.5px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 11px center
+        }
+
+        .fld-sel:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .2)
+        }
+
+        .fld-sel option {
+            background: var(--th)
+        }
+
+        /* Divider */
+        .or-div {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: .4px;
+            margin: 4px 0 8px
+        }
+
+        .or-div::before,
+        .or-div::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--stroke)
+        }
+
+        /* CTA */
+        .cta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .btn-check {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            border-radius: 11px;
+            padding: 13px 32px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px var(--brand-ring);
+            transition: background .18s, transform .15s, box-shadow .15s;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-check:hover {
+            background: var(--brand-d);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--brand-ring)
+        }
+
+        .btn-check:active {
+            transform: translateY(0)
+        }
+
+        .btn-check:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            pointer-events: none
+        }
+
+        .btn-reset {
+            background: none;
+            border: 1.5px solid var(--stroke2);
+            border-radius: 11px;
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .18s
+        }
+
+        .btn-reset:hover {
+            background: var(--row-hover);
+            color: var(--ink);
+            border-color: var(--stroke2)
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            margin-top: 18px;
+            padding: 13px 16px;
+            background: var(--th);
+            border-radius: 10px;
+            border: 1px solid var(--stroke)
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .leg-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        /* ─────────────────────────────────────────
+   RESULTS
+───────────────────────────────────────── */
+        #resultSection {
+            display: none
+        }
+
+        /* Score strip */
+        .score-strip {
+            background: var(--card);
+            border: 1.5px solid var(--stroke);
+            border-radius: var(--r);
+            padding: 14px 20px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow)
+        }
+
+        .ss-item {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .ss-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted)
+        }
+
+        .ss-val {
+            font-family: var(--mono);
+            font-weight: 600;
+            font-size: 17px;
+            color: var(--brand)
+        }
+
+        .ss-sep {
+            width: 1px;
+            height: 28px;
+            background: var(--stroke);
+            flex-shrink: 0
+        }
+
+        /* Summary boxes */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 22px
+        }
+
+        @media(max-width:480px) {
+            .summary-row {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .sum-box {
+            background: var(--card);
+            border: 1.5px solid var(--stroke);
+            border-radius: var(--r);
+            padding: 18px;
+            text-align: center;
+            box-shadow: var(--shadow)
+        }
+
+        .sum-num {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 32px;
+            letter-spacing: -1px;
+            font-variant-numeric: tabular-nums
+        }
+
+        .sum-lbl {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px
+        }
+
+        .s-g .sum-num {
+            color: var(--green)
+        }
+
+        .s-y .sum-num {
+            color: var(--yellow)
+        }
+
+        .s-o .sum-num {
+            color: var(--orange)
+        }
+
+        /* Active filter bar */
+        .active-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 18px;
+            padding: 12px 16px;
+            background: var(--card);
+            border: 1.5px solid var(--stroke);
+            border-radius: var(--r);
+            box-shadow: var(--shadow)
+        }
+
+        .afb-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--muted)
+        }
+
+        .afb-sel {
+            background: var(--th);
+            border: 1.5px solid var(--stroke2);
+            border-radius: 8px;
+            padding: 7px 32px 7px 11px;
+            font-size: 13px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            min-width: 140px;
+            max-width: 220px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 9px center
+        }
+
+        .afb-sel:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .2)
+        }
+
+        .afb-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            font-family: var(--mono);
+            white-space: nowrap
+        }
+
+        /* Tier */
+        .tier {
+            margin-bottom: 36px
+        }
+
+        .tier-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--stroke)
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase
+        }
+
+        .t-high .tier-badge {
+            background: var(--green-bg);
+            border: 1px solid var(--green-b);
+            color: var(--green)
+        }
+
+        .t-med .tier-badge {
+            background: var(--yellow-bg);
+            border: 1px solid var(--yellow-b);
+            color: var(--yellow)
+        }
+
+        .t-low .tier-badge {
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-b);
+            color: var(--orange)
+        }
+
+        .tier-ct {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--muted);
+            margin-left: auto
+        }
+
+        .tier-desc {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.5;
+            max-width: 480px
+        }
+
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+            gap: 12px
+        }
+
+        .cc {
+            background: var(--card);
+            border: 1.5px solid var(--stroke);
+            border-radius: var(--r);
+            padding: 17px 18px 14px;
+            transition: box-shadow .2s, transform .15s;
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            animation: cardIn .22s ease both
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .cc:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg)
+        }
+
+        .cc.c-high {
+            border-left: 4px solid var(--green)
+        }
+
+        .cc.c-med {
+            border-left: 4px solid var(--yellow)
+        }
+
+        .cc.c-low {
+            border-left: 4px solid var(--orange)
+        }
+
+        .cc-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px
+        }
+
+        .cc-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            color: var(--ink);
+            line-height: 1.35;
+            flex: 1
+        }
+
+        .cc-region {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--muted);
+            background: var(--th);
+            border: 1px solid var(--stroke);
+            border-radius: 6px;
+            padding: 2px 8px;
+            white-space: nowrap;
+            flex-shrink: 0
+        }
+
+        .cc-branch {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.4
+        }
+
+        .cc-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap
+        }
+
+        .chip-indigo {
+            background: var(--chip-bg);
+            color: var(--chip)
+        }
+
+        .chip-gray {
+            background: var(--th);
+            color: var(--muted);
+            border: 1px solid var(--stroke)
+        }
+
+        .chip-blue {
+            background: var(--blue-bg);
+            color: var(--blue)
+        }
+
+        .cc-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .metric {
+            background: var(--bg);
+            border: 1px solid var(--stroke);
+            border-radius: 9px;
+            padding: 9px 11px
+        }
+
+        .metric-lbl {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 3px
+        }
+
+        .metric-val {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums
+        }
+
+        .metric-delta {
+            font-size: 10.5px;
+            font-weight: 700;
+            margin-top: 2px
+        }
+
+        .d-pos {
+            color: var(--green)
+        }
+
+        .d-neg {
+            color: var(--orange)
+        }
+
+        .d-neu {
+            color: var(--yellow)
+        }
+
+        /* Prob bar */
+        .prob-bar {
+            margin-top: 2px
+        }
+
+        .pb-track {
+            height: 5px;
+            background: var(--stroke);
+            border-radius: 999px;
+            overflow: hidden
+        }
+
+        .pb-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width .6s cubic-bezier(.4, 0, .2, 1)
+        }
+
+        .pb-high {
+            background: var(--green)
+        }
+
+        .pb-med {
+            background: var(--yellow)
+        }
+
+        .pb-low {
+            background: var(--orange)
+        }
+
+        .pb-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .pb-tier-lbl {
+            font-weight: 700
+        }
+
+        .pb-tier-high {
+            color: var(--green)
+        }
+
+        .pb-tier-med {
+            color: var(--yellow)
+        }
+
+        .pb-tier-low {
+            color: var(--orange)
+        }
+
+        /* Expand */
+        .cc-more {
+            display: flex;
+            justify-content: flex-end
+        }
+
+        .btn-more {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11.5px;
+            color: var(--muted);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 0;
+            transition: color .18s
+        }
+
+        .btn-more:hover {
+            color: var(--brand)
+        }
+
+        .cc-extra {
+            display: none;
+            padding-top: 11px;
+            border-top: 1px solid var(--stroke)
+        }
+
+        .cc-extra.open {
+            display: block
+        }
+
+        .xrow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 12.5px;
+            color: var(--muted);
+            border-bottom: 1px solid var(--stroke)
+        }
+
+        .xrow:last-of-type {
+            border-bottom: none
+        }
+
+        .xrow span:last-child {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--ink);
+            font-weight: 600
+        }
+
+        .xlink {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--blue);
+            text-decoration: none;
+            transition: opacity .15s
+        }
+
+        .xlink:hover {
+            opacity: .7
+        }
+
+        /* Empty / loading */
+        .tier-empty {
+            text-align: center;
+            padding: 24px;
+            color: var(--muted);
+            font-size: 13px;
+            background: var(--th);
+            border: 1.5px dashed var(--stroke2);
+            border-radius: var(--r)
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+            grid-column: 1/-1
+        }
+
+        .no-results-icon {
+            font-size: 46px;
+            margin-bottom: 14px
+        }
+
+        .no-results h3 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--ink2);
+            margin-bottom: 6px
+        }
+
+        .no-results p {
+            font-size: 13.5px;
+            line-height: 1.6;
+            max-width: 340px;
+            margin: 0 auto
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--stroke);
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: 48px auto 16px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .loading-msg {
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            padding-bottom: 30px
+        }
+
+        /* Responsive */
+        @media(max-width:600px) {
+            .wrap {
+                padding: 20px 14px 70px
+            }
+
+            .hero-banner {
+                padding: 22px 18px
+            }
+
+            .search-card {
+                padding: 20px 16px
+            }
+
+            .topbar-inner {
+                padding: 0 14px
+            }
+
+            .hero-stats {
+                gap: 16px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="#">
+                <div class="brand-logo">CS</div>
+                <div class="brand-name">College Simplified
+                    <span>MHT-CET AI Seat Eligibility</span>
+                </div>
+            </a>
+            <div class="topbar-right">
+                <div class="badge-pill">2024 Cutoffs</div>
+                <label class="tgl" title="Toggle dark mode">
+                    <input type="checkbox" id="themeToggle" onchange="toggleTheme(this)">
+                    <div class="tgl-track"></div>
+                    <div class="tgl-knob"></div>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <div class="wrap">
+
+        <!-- HERO BANNER -->
+        <div class="hero-banner">
+            <div class="hero-eyebrow"><span class="live-dot"></span>All India Seats · JEE Mains 2024</div>
+            <h1>Find Your Best Colleges<br>for MHT-CET Counselling</h1>
+            <p>Enter your JEE Percentile or All India Rank to instantly discover which colleges you're eligible for —
+                filtered by region and branch, ranked by admission probability.</p>
+            <div class="hero-stats">
+                <div class="hstat">
+                    <div class="hstat-val" id="statTotal">—</div>
+                    <div class="hstat-lbl">Cutoff Records</div>
+                </div>
+                <div class="hstat">
+                    <div class="hstat-val" id="statColleges">—</div>
+                    <div class="hstat-lbl">Institutes</div>
+                </div>
+                <div class="hstat">
+                    <div class="hstat-val" id="statRegions">—</div>
+                    <div class="hstat-lbl">Regions</div>
+                </div>
+                <div class="hstat">
+                    <div class="hstat-val" id="statBranches">—</div>
+                    <div class="hstat-lbl">Branch Groups</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH CARD -->
+        <div class="search-card">
+            <div class="sc-title">⚡ Check Your Eligibility</div>
+            <div class="sc-sub">Enter your score, pick your preferred region &amp; branch group, then hit Check.</div>
+
+            <!-- Mode tabs -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="both" onclick="setMode(this,'both')">Both</button>
+                <button class="mode-tab" data-mode="pct" onclick="setMode(this,'pct')">Percentile Only</button>
+                <button class="mode-tab" data-mode="rank" onclick="setMode(this,'rank')">Rank Only</button>
+            </div>
+
+            <!-- Score inputs -->
+            <div class="score-row">
+                <div class="field" id="pctWrap">
+                    <label>JEE Percentile</label>
+                    <input type="number" id="inPct" step="0.0001" min="0" max="100" placeholder="e.g. 95.4321">
+                    <div class="field-hint">0 – 100 · up to 4 decimal places</div>
+                </div>
+                <div class="field" id="rankWrap">
+                    <label>All India Merit Rank</label>
+                    <input type="number" id="inRank" min="1" placeholder="e.g. 8500">
+                    <div class="field-hint">Lower number = better rank</div>
+                </div>
+            </div>
+
+            <!-- Filters row -->
+            <div class="filter-grid">
+                <div class="field">
+                    <label>Region</label>
+                    <select class="fld-sel" id="selRegion">
+                        <option value="">All Regions</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Branch Group</label>
+                    <select class="fld-sel" id="selBranchGroup">
+                        <option value="">All Branches</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Seat Type</label>
+                    <select class="fld-sel" id="selSeat">
+                        <option value="">All Types</option>
+                        <option value="AI">AI (All India)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-row">
+                <button class="btn-check" id="btnCheck" onclick="runCheck()">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                        <path stroke="#fff" stroke-width="2.2" stroke-linecap="round"
+                            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                    </svg>
+                    Check Eligibility
+                </button>
+                <button class="btn-reset" onclick="resetAll()">Reset</button>
+                <span id="dataStatusMsg" style="font-size:12px;color:var(--muted);margin-left:4px"></span>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="leg-item"><span class="leg-dot" style="background:var(--green)"></span>High Probability —
+                    Comfortably above cutoff</div>
+                <div class="leg-item"><span class="leg-dot" style="background:var(--yellow)"></span>Medium — Borderline,
+                    apply strategically</div>
+                <div class="leg-item"><span class="leg-dot" style="background:var(--orange)"></span>Low — Reach
+                    colleges, still worth trying</div>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div id="loadingSection" style="display:none">
+            <div class="spinner"></div>
+            <div class="loading-msg">Searching colleges…</div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="resultSection">
+
+            <!-- Score strip -->
+            <div class="score-strip" id="scoreStrip"></div>
+
+            <!-- Summary -->
+            <div class="summary-row">
+                <div class="sum-box s-g">
+                    <div class="sum-num" id="cntHigh">0</div>
+                    <div class="sum-lbl">✅ High Probability</div>
+                </div>
+                <div class="sum-box s-y">
+                    <div class="sum-num" id="cntMed">0</div>
+                    <div class="sum-lbl">⚡ Medium</div>
+                </div>
+                <div class="sum-box s-o">
+                    <div class="sum-num" id="cntLow">0</div>
+                    <div class="sum-lbl">🎯 Reach</div>
+                </div>
+            </div>
+
+            <!-- Post-result filter -->
+            <div class="active-filter-bar">
+                <span class="afb-label">Refine</span>
+                <select class="afb-sel" id="rfRegion" onchange="renderFiltered()">
+                    <option value="">All Regions</option>
+                </select>
+                <select class="afb-sel" id="rfBranch" onchange="renderFiltered()">
+                    <option value="">All Branches</option>
+                </select>
+                <div class="afb-count" id="rfCount"></div>
+            </div>
+
+            <!-- HIGH -->
+            <div class="tier t-high" id="tierHigh">
+                <div class="tier-head">
+                    <div class="tier-badge">✅ High Probability</div>
+                    <div class="tier-desc">Your score is comfortably above the cutoff — strong admission chance.</div>
+                    <div class="tier-ct" id="lblHigh"></div>
+                </div>
+                <div class="cards-grid" id="cardsHigh"></div>
+            </div>
+
+            <!-- MED -->
+            <div class="tier t-med" id="tierMed">
+                <div class="tier-head">
+                    <div class="tier-badge">⚡ Medium Probability</div>
+                    <div class="tier-desc">Score is very close to cutoff — admission possible but not guaranteed.</div>
+                    <div class="tier-ct" id="lblMed"></div>
+                </div>
+                <div class="cards-grid" id="cardsMed"></div>
+            </div>
+
+            <!-- LOW -->
+            <div class="tier t-low" id="tierLow">
+                <div class="tier-head">
+                    <div class="tier-badge">🎯 Reach Colleges</div>
+                    <div class="tier-desc">Cutoff is slightly above your score — worth filling as a backup choice.</div>
+                    <div class="tier-ct" id="lblLow"></div>
+                </div>
+                <div class="cards-grid" id="cardsLow"></div>
+            </div>
+
+        </div><!-- /resultSection -->
+    </div><!-- /wrap -->
+
+    <script>
+        'use strict';
+
+        /* ──────────────────────────────────────────
+           BRANCH GROUPS
+        ────────────────────────────────────────── */
+        var BRANCH_GROUPS = [
+            {
+                id: 'cs', label: '💻 Computer Science & IT',
+                keys: ['computer science', 'computer engineering', 'information technology', 'cs&it', 'cs &it', 'cse']
+            },
+            {
+                id: 'aiml', label: '🤖 AI, ML & Data Science',
+                keys: ['artificial intelligence', 'machine learning', 'data science', 'data engineering', 'ai & ml', 'aiml']
+            },
+            {
+                id: 'ece', label: '📡 Electronics & Communication',
+                keys: ['electronics and communication', 'electronics & communication', 'ece', 'telecommunication', 'vlsi', 'embedded']
+            },
+            {
+                id: 'ee', label: '⚡ Electrical Engineering',
+                keys: ['electrical', 'power systems', 'electrical and electronics']
+            },
+            {
+                id: 'mech', label: '🔧 Mechanical Engineering',
+                keys: ['mechanical', 'production engineering', 'manufacturing', 'automobile', 'robotics']
+            },
+            {
+                id: 'civil', label: '🏗️ Civil Engineering',
+                keys: ['civil', 'structural', 'environmental', 'geotechnical', 'transportation']
+            },
+            {
+                id: 'chem', label: '🧪 Chemical & Biochemical',
+                keys: ['chemical', 'petrochemical', 'biochemistry', 'pharmaceutical']
+            },
+            {
+                id: 'it', label: '🔗 Information Technology (standalone)',
+                keys: ['information technology']
+            },
+            { id: 'other', label: '🔬 Other Engineering', keys: [] }
+        ];
+
+        function getBranchGroup(branchName) {
+            var b = branchName.toLowerCase();
+            for (var i = 0; i < BRANCH_GROUPS.length - 1; i++) {
+                var g = BRANCH_GROUPS[i];
+                for (var j = 0; j < g.keys.length; j++) {
+                    if (b.indexOf(g.keys[j]) !== -1) return g.id;
+                }
+            }
+            return 'other';
+        }
+
+        /* ──────────────────────────────────────────
+           STATE
+        ────────────────────────────────────────── */
+        var DATA = [], DATA_READY = false, INPUT_MODE = 'both';
+        var RES_HIGH = [], RES_MED = [], RES_LOW = [];
+
+        /* ──────────────────────────────────────────
+           LOAD DATA
+        ────────────────────────────────────────── */
+        (function loadData() {
+            var msg = document.getElementById('dataStatusMsg');
+            msg.textContent = 'Loading data…';
+            fetch('jee_data.json')
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .then(function (json) {
+                    var arr = Array.isArray(json) ? json : json[Object.keys(json)[0]] || [];
+                    DATA = arr.map(function (row) {
+                        var inst = (row['Institute Name'] || '').replace(/^\d+\s*-\s*/, '').trim();
+                        var branch = (row['Branch Name'] || '').replace(/\n/g, ' ').trim();
+                        var pct = parseFloat(row['JEE Percentile'] || 0) || 0;
+                        var airRaw = (row['All India Merit'] || '').trim();
+                        var rm = airRaw.match(/^(\d+)/);
+                        var rank = rm ? parseInt(rm[1]) : 0;
+                        return {
+                            inst: inst, branch: branch, pct: pct, rank: rank,
+                            code: row['College Code'] || '',
+                            seatType: row['Seat Type'] || 'AI',
+                            region: (row['Region'] || '').trim(),
+                            type: row['Type'] || '',
+                            url: row['College Url'] || '',
+                            airRaw: airRaw,
+                            choiceCode: row['Choice Code'] || '',
+                            branchGroup: getBranchGroup(branch)
+                        };
+                    }).filter(function (r) { return r.pct > 0; });
+
+                    DATA_READY = true;
+                    msg.textContent = '✓ ' + DATA.length.toLocaleString('en-IN') + ' records loaded';
+                    setTimeout(function () { msg.textContent = '' }, 3000);
+                    populateFilters();
+                    updateStats();
+                })
+                .catch(function (err) {
+                    msg.textContent = '⚠ Could not load jee_data.json — ' + err.message;
+                    msg.style.color = 'var(--brand)';
+                });
+        })();
+
+        function updateStats() {
+            var colleges = new Set(DATA.map(function (r) { return r.code }));
+            var regions = new Set(DATA.map(function (r) { return r.region }).filter(Boolean));
+            document.getElementById('statTotal').textContent = DATA.length.toLocaleString('en-IN');
+            document.getElementById('statColleges').textContent = colleges.size;
+            document.getElementById('statRegions').textContent = regions.size;
+            document.getElementById('statBranches').textContent = BRANCH_GROUPS.length;
+        }
+
+        /* ──────────────────────────────────────────
+           POPULATE FILTER DROPDOWNS
+        ────────────────────────────────────────── */
+        function populateFilters() {
+            // Regions
+            var regions = [...new Set(DATA.map(function (r) { return r.region }).filter(Boolean))].sort();
+            var rSel = document.getElementById('selRegion');
+            rSel.innerHTML = '<option value="">All Regions</option>' +
+                regions.map(function (r) { return '<option value="' + xe(r) + '">' + xe(r) + '</option>' }).join('');
+
+            // Branch groups (only those present in data)
+            var present = new Set(DATA.map(function (r) { return r.branchGroup }));
+            var bSel = document.getElementById('selBranchGroup');
+            bSel.innerHTML = '<option value="">All Branches</option>' +
+                BRANCH_GROUPS.filter(function (g) { return present.has(g.id) })
+                    .map(function (g) { return '<option value="' + g.id + '">' + g.label + '</option>' }).join('');
+
+            // Seat types
+            var seats = [...new Set(DATA.map(function (r) { return r.seatType }).filter(Boolean))].sort();
+            var sSel = document.getElementById('selSeat');
+            sSel.innerHTML = '<option value="">All Types</option>' +
+                seats.map(function (s) { return '<option value="' + xe(s) + '">' + xe(s) + '</option>' }).join('');
+        }
+
+        /* ──────────────────────────────────────────
+           MODE
+        ────────────────────────────────────────── */
+        function setMode(el, m) {
+            INPUT_MODE = m;
+            document.querySelectorAll('.mode-tab').forEach(function (t) { t.classList.remove('active') });
+            el.classList.add('active');
+            var pw = document.getElementById('pctWrap'), rw = document.getElementById('rankWrap');
+            if (m === 'pct') { pw.style.display = ''; rw.style.display = 'none'; }
+            else if (m === 'rank') { pw.style.display = 'none'; rw.style.display = ''; }
+            else { pw.style.display = ''; rw.style.display = ''; }
+        }
+
+        /* ──────────────────────────────────────────
+           TIER LOGIC
+        ────────────────────────────────────────── */
+        function getTier(row, userPct, userRank) {
+            if (userPct > 0 && row.pct > 0) {
+                var d = userPct - row.pct;
+                if (d >= 1.5) return 'high';
+                if (d >= -0.5) return 'med';
+                if (d >= -2.5) return 'low';
+                return null;
+            }
+            if (userRank > 0 && row.rank > 0) {
+                var ratio = userRank / row.rank;
+                if (ratio <= 0.85) return 'high';
+                if (ratio <= 1.05) return 'med';
+                if (ratio <= 1.20) return 'low';
+                return null;
+            }
+            return null;
+        }
+
+        /* ──────────────────────────────────────────
+           RUN CHECK
+        ────────────────────────────────────────── */
+        function runCheck() {
+            if (!DATA_READY) { alert('Data is still loading. Please wait.'); return; }
+            var pct = parseFloat(document.getElementById('inPct').value) || 0;
+            var rank = parseInt(document.getElementById('inRank').value) || 0;
+            if (INPUT_MODE === 'pct' && !pct) { alert('Please enter your JEE Percentile.'); return; }
+            if (INPUT_MODE === 'rank' && !rank) { alert('Please enter your All India Merit Rank.'); return; }
+            if (INPUT_MODE === 'both' && !pct && !rank) { alert('Please enter at least one value.'); return; }
+
+            var fRegion = document.getElementById('selRegion').value;
+            var fBGroup = document.getElementById('selBranchGroup').value;
+            var fSeat = document.getElementById('selSeat').value;
+
+            // Score strip
+            var ss = document.getElementById('scoreStrip');
+            ss.innerHTML = '';
+            if (pct) ss.innerHTML += '<div class="ss-item"><span class="ss-label">JEE Percentile</span><span class="ss-val">' + pct.toFixed(4) + '</span></div>';
+            if (pct && rank) ss.innerHTML += '<div class="ss-sep"></div>';
+            if (rank) ss.innerHTML += '<div class="ss-item"><span class="ss-label">AI Merit Rank</span><span class="ss-val">#' + rank.toLocaleString('en-IN') + '</span></div>';
+            if (fRegion) ss.innerHTML += '<div class="ss-sep"></div><div class="ss-item"><span class="ss-label">Region</span><span class="ss-val">' + xe(fRegion) + '</span></div>';
+            if (fBGroup) {
+                var bg = BRANCH_GROUPS.find(function (g) { return g.id === fBGroup });
+                if (bg) ss.innerHTML += '<div class="ss-sep"></div><div class="ss-item"><span class="ss-label">Branch</span><span class="ss-val" style="font-size:13px">' + xe(bg.label) + '</span></div>';
+            }
+
+            RES_HIGH = []; RES_MED = []; RES_LOW = [];
+            DATA.forEach(function (row) {
+                if (fRegion && row.region !== fRegion) return;
+                if (fBGroup && row.branchGroup !== fBGroup) return;
+                if (fSeat && row.seatType !== fSeat) return;
+                var t = getTier(row, pct, rank);
+                if (t === 'high') RES_HIGH.push({ row: row });
+                else if (t === 'med') RES_MED.push({ row: row });
+                else if (t === 'low') RES_LOW.push({ row: row });
+            });
+
+            function sortD(a, b) { return b.row.pct - a.row.pct; }
+            RES_HIGH.sort(sortD); RES_MED.sort(sortD); RES_LOW.sort(sortD);
+
+            document.getElementById('cntHigh').textContent = RES_HIGH.length;
+            document.getElementById('cntMed').textContent = RES_MED.length;
+            document.getElementById('cntLow').textContent = RES_LOW.length;
+
+            buildPostFilters();
+            renderFiltered();
+
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('loadingSection').style.display = 'none';
+            setTimeout(function () {
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 80);
+        }
+
+        /* ──────────────────────────────────────────
+           POST-RESULT FILTERS
+        ────────────────────────────────────────── */
+        function buildPostFilters() {
+            var all = RES_HIGH.concat(RES_MED).concat(RES_LOW);
+            var regions = {}, branches = {};
+            all.forEach(function (item) {
+                if (item.row.region) regions[item.row.region] = 1;
+                if (item.row.branch) branches[item.row.branch] = 1;
+            });
+            var rSel = document.getElementById('rfRegion');
+            rSel.innerHTML = '<option value="">All Regions</option>' +
+                Object.keys(regions).sort().map(function (r) { return '<option value="' + xe(r) + '">' + xe(r) + '</option>' }).join('');
+            var bSel = document.getElementById('rfBranch');
+            bSel.innerHTML = '<option value="">All Branches</option>' +
+                Object.keys(branches).sort().map(function (b) { return '<option value="' + xe(b) + '">' + xe(b) + '</option>' }).join('');
+        }
+
+        function renderFiltered() {
+            var fr = document.getElementById('rfRegion').value;
+            var fb = document.getElementById('rfBranch').value;
+            function filt(arr) {
+                return arr.filter(function (item) {
+                    if (fr && item.row.region !== fr) return false;
+                    if (fb && item.row.branch !== fb) return false;
+                    return true;
+                });
+            }
+            var h = filt(RES_HIGH), m = filt(RES_MED), l = filt(RES_LOW);
+            document.getElementById('lblHigh').textContent = h.length + ' college' + (h.length !== 1 ? 's' : '');
+            document.getElementById('lblMed').textContent = m.length + ' college' + (m.length !== 1 ? 's' : '');
+            document.getElementById('lblLow').textContent = l.length + ' college' + (l.length !== 1 ? 's' : '');
+            document.getElementById('rfCount').textContent = (h.length + m.length + l.length) + ' matching';
+            renderTier('cardsHigh', h, 'high');
+            renderTier('cardsMed', m, 'med');
+            renderTier('cardsLow', l, 'low');
+            document.getElementById('tierHigh').style.display = h.length ? '' : 'none';
+            document.getElementById('tierMed').style.display = m.length ? '' : 'none';
+            document.getElementById('tierLow').style.display = l.length ? '' : 'none';
+            if (!h.length && !m.length && !l.length) {
+                document.getElementById('tierHigh').style.display = 'block';
+                document.getElementById('cardsHigh').innerHTML = '<div class="no-results"><div class="no-results-icon">🔍</div><h3>No Matching Colleges</h3><p>Try loosening your filters or entering a different score.</p></div>';
+            }
+        }
+
+        /* ──────────────────────────────────────────
+           RENDER TIER
+        ────────────────────────────────────────── */
+        function renderTier(cid, items, tier) {
+            var container = document.getElementById(cid);
+            if (!items.length) {
+                container.innerHTML = '<div class="tier-empty">No colleges in this category with current filters.</div>';
+                return;
+            }
+            var userPct = parseFloat(document.getElementById('inPct').value) || 0;
+            var userRank = parseInt(document.getElementById('inRank').value) || 0;
+            var html = '';
+            items.forEach(function (item, i) {
+                var row = item.row;
+                var delay = Math.min(i * 18, 360);
+                var id = 'x_' + tier + '_' + i;
+
+                // Delta pct
+                var deltaHTML = '';
+                if (userPct > 0 && row.pct > 0) {
+                    var d = userPct - row.pct, sign = d >= 0 ? '+' : '', cls = d >= 0 ? 'd-pos' : (d >= -2 ? 'd-neu' : 'd-neg');
+                    deltaHTML = '<div class="metric-delta ' + cls + '">' + sign + d.toFixed(4) + ' pts vs cutoff</div>';
+                }
+                // Delta rank
+                var rdeltaHTML = '';
+                if (userRank > 0 && row.rank > 0) {
+                    var rd = row.rank - userRank, rs = rd >= 0 ? '+' : '', rc = rd >= 0 ? 'd-pos' : 'd-neg';
+                    rdeltaHTML = '<div class="metric-delta ' + rc + '">' + rs + rd.toLocaleString('en-IN') + ' rank buffer</div>';
+                }
+                // Bar width
+                var bw = tier === 'high' ? 72 + Math.random() * 23 : tier === 'med' ? 38 + Math.random() * 24 : 12 + Math.random() * 26;
+                bw = Math.round(bw);
+                // Branch group label
+                var bg = BRANCH_GROUPS.find(function (g) { return g.id === row.branchGroup });
+                var bgLabel = bg ? bg.label : '';
+
+                html += '<div class="cc c-' + tier + '" style="animation-delay:' + delay + 'ms">';
+                html += '<div class="cc-head">';
+                html += '<div class="cc-name">' + xe(row.inst) + '</div>';
+                if (row.region) html += '<div class="cc-region">' + xe(row.region) + '</div>';
+                html += '</div>';
+                html += '<div class="cc-branch">' + xe(row.branch) + '</div>';
+                html += '<div class="cc-chips">';
+                if (row.seatType) html += '<span class="chip chip-indigo">' + xe(row.seatType) + '</span>';
+                if (row.type) html += '<span class="chip chip-gray">' + xe(row.type) + '</span>';
+                if (bgLabel) html += '<span class="chip chip-blue">' + xe(bgLabel.replace(/^[^ ]+ /, '')) + '</span>';
+                html += '</div>';
+                html += '<div class="cc-metrics">';
+                html += '<div class="metric"><div class="metric-lbl">Cutoff Percentile</div><div class="metric-val">' + row.pct.toFixed(4) + '</div>' + deltaHTML + '</div>';
+                if (row.rank > 0) {
+                    html += '<div class="metric"><div class="metric-lbl">Cutoff AI Rank</div><div class="metric-val">#' + row.rank.toLocaleString('en-IN') + '</div>' + rdeltaHTML + '</div>';
+                }
+                html += '</div>';
+                html += '<div class="prob-bar">';
+                html += '<div class="pb-track"><div class="pb-fill pb-' + tier + '" style="width:' + bw + '%"></div></div>';
+                html += '<div class="pb-labels"><span>Admission Probability</span>';
+                html += '<span class="pb-tier-lbl pb-tier-' + tier + '">' + (tier === 'high' ? 'HIGH' : tier === 'med' ? 'MEDIUM' : 'LOW') + '</span>';
+                html += '</div></div>';
+                html += '<div class="cc-more"><button class="btn-more" onclick="toggleX(\'' + id + '\',this)">Details ▾</button></div>';
+                html += '<div class="cc-extra" id="' + id + '">';
+                html += '<div class="xrow"><span>College Code</span><span>' + xe(row.code) + '</span></div>';
+                html += '<div class="xrow"><span>Choice Code</span><span>' + xe(row.choiceCode) + '</span></div>';
+                html += '<div class="xrow"><span>Cutoff AI Merit</span><span>' + xe(row.airRaw) + '</span></div>';
+                html += '<div class="xrow"><span>Branch Group</span><span>' + xe(bgLabel) + '</span></div>';
+                if (row.url) html += '<a class="xlink" href="' + xe(row.url) + '" target="_blank" rel="noopener">↗ MahaCET Portal</a>';
+                html += '</div>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        /* ──────────────────────────────────────────
+           UTILS
+        ────────────────────────────────────────── */
+        function toggleX(id, btn) {
+            var el = document.getElementById(id);
+            var open = el.classList.toggle('open');
+            btn.textContent = open ? 'Hide ▴' : 'Details ▾';
+        }
+
+        function resetAll() {
+            document.getElementById('inPct').value = '';
+            document.getElementById('inRank').value = '';
+            document.getElementById('selRegion').value = '';
+            document.getElementById('selBranchGroup').value = '';
+            document.getElementById('selSeat').value = '';
+            document.getElementById('resultSection').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheme(el) {
+            document.documentElement.setAttribute('data-theme', el.checked ? 'dark' : 'light');
+        }
+
+        function xe(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Seat Eligibility Checker — MHT-CET Counselling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ── VARIABLES (Doc 2 system) ── */
+        :root {
+            --brand: #e63946;
+            --brand-d: #c1121f;
+            --brand-soft: #fff0f1;
+            --brand-ring: rgba(230, 57, 70, .15);
+
+            --ink: #0f1117;
+            --ink2: #2d3240;
+            --ink3: #6c7389;
+
+            --bg: #f5f6fa;
+            --surface: #ffffff;
+            --surface2: #f8f9fc;
+            --border: #e4e6ef;
+            --border2: #d0d3e2;
+
+            --green: #16a34a;
+            --green-bg: #f0fdf4;
+            --green-border: rgba(22, 163, 74, .3);
+
+            --yellow: #d97706;
+            --yellow-bg: #fffbeb;
+            --yellow-border: rgba(217, 119, 6, .3);
+
+            --orange: #d97706;
+            --orange-bg: #fff7ed;
+            --orange-border: rgba(217, 119, 6, .3);
+
+            --blue: #2563eb;
+            --blue-bg: #eff6ff;
+
+            --chip-bg: #eef2ff;
+            --chip: #3b5bdb;
+
+            --shadow: 0 2px 16px rgba(15, 17, 23, .07);
+            --shadow-lg: 0 8px 32px rgba(15, 17, 23, .10);
+            --radius: 14px;
+            --font-mono: 'DM Mono', monospace;
+        }
+
+        [data-theme="dark"] {
+            --brand: #ff6b74;
+            --brand-d: #e63946;
+            --brand-soft: #2a1215;
+            --brand-ring: rgba(255, 107, 116, .15);
+
+            --ink: #f0f1f6;
+            --ink2: #c8cad8;
+            --ink3: #8b90a8;
+
+            --bg: #0b0d14;
+            --surface: #131620;
+            --surface2: #0f1219;
+            --border: #222636;
+            --border2: #2a2f45;
+
+            --green: #4ade80;
+            --green-bg: #0a1f10;
+            --green-border: rgba(74, 222, 128, .3);
+
+            --yellow: #fb923c;
+            --yellow-bg: #1f1208;
+            --yellow-border: rgba(251, 146, 60, .3);
+
+            --orange: #fb923c;
+            --orange-bg: #1f1208;
+            --orange-border: rgba(251, 146, 60, .3);
+
+            --blue: #60a5fa;
+            --blue-bg: #0e1a38;
+
+            --chip-bg: #1a2150;
+            --chip: #94b4ff;
+
+            --shadow: 0 2px 16px rgba(0, 0, 0, .3);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, .4);
+        }
+
+        /* ── RESET ── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            transition: background .25s, color .25s;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 62px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--brand);
+            display: grid;
+            place-items: center;
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            color: #fff;
+            box-shadow: 0 4px 14px var(--brand-ring);
+            flex-shrink: 0;
+        }
+
+        .brand-title {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--ink);
+            line-height: 1.2;
+        }
+
+        .brand-sub {
+            font-size: 9px;
+            font-weight: 500;
+            color: var(--ink3);
+            margin-top: 1px;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            font-family: 'Outfit', sans-serif;
+            display: block;
+        }
+
+        .topbar-tag {
+            margin-left: auto;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--brand);
+            letter-spacing: .3px;
+        }
+
+        /* ── LAYOUT ── */
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 36px 20px 80px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--ink3);
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        .hero-eyebrow span {
+            width: 7px;
+            height: 7px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .6;
+                transform: scale(.8);
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: clamp(26px, 5vw, 44px);
+            line-height: 1.1;
+            color: var(--ink);
+            margin-bottom: 14px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            color: var(--brand);
+        }
+
+        .hero p {
+            color: var(--ink3);
+            font-size: 15px;
+            line-height: 1.7;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        /* ── INPUT CARD ── */
+        .input-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+        }
+
+        .input-card-title {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--ink);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-card-sub {
+            font-size: 13px;
+            color: var(--ink3);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 10px;
+            width: fit-content;
+            border: 1.5px solid var(--border);
+        }
+
+        .mode-tab {
+            padding: 7px 18px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--ink3);
+            transition: all .18s;
+            border: none;
+            background: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .mode-tab.active {
+            background: var(--surface);
+            color: var(--ink);
+            border: 1.5px solid var(--border2);
+            box-shadow: var(--shadow);
+        }
+
+        /* Input Row */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        @media(max-width: 640px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink3);
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            background: var(--surface);
+            border: 1.5px solid var(--border2);
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-size: 15px;
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none;
+        }
+
+        .field input::placeholder {
+            color: var(--ink3);
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .field input:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .25);
+        }
+
+        .field-hint {
+            font-size: 11.5px;
+            color: var(--ink3);
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .field-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ink3);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .3px;
+            padding-bottom: 8px;
+        }
+
+        .field-divider::before,
+        .field-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Check Button */
+        .btn-check {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 11px 26px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            letter-spacing: .2px;
+            white-space: nowrap;
+            box-shadow: 0 4px 14px var(--brand-ring);
+            transition: background .18s, transform .15s, box-shadow .15s;
+            align-self: end;
+        }
+
+        .btn-check:hover {
+            background: var(--brand-d);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px var(--brand-ring);
+        }
+
+        .btn-check:active {
+            transform: translateY(0);
+        }
+
+        .btn-check:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Range Hint */
+        .range-hint {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .range-hint-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            color: var(--ink3);
+        }
+
+        .rh-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── RESULT SECTION ── */
+        #resultSection {
+            display: none;
+        }
+
+        /* Summary */
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        @media(max-width: 500px) {
+            .result-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            border: 1.5px solid var(--border);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-count {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            font-size: 30px;
+            letter-spacing: -1px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: var(--ink3);
+            margin-top: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .s-green .summary-count {
+            color: var(--green);
+        }
+
+        .s-yellow .summary-count {
+            color: var(--yellow);
+        }
+
+        .s-orange .summary-count {
+            color: var(--orange);
+        }
+
+        /* Score Display */
+        .score-display {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+        }
+
+        .score-display-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink3);
+        }
+
+        .score-value {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--brand);
+        }
+
+        /* Tier */
+        .tier {
+            margin-bottom: 32px;
+        }
+
+        .tier-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+        }
+
+        .tier-count {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink3);
+            margin-left: auto;
+        }
+
+        .tier-desc {
+            font-size: 12.5px;
+            color: var(--ink3);
+            line-height: 1.5;
+            max-width: 500px;
+        }
+
+        .t-high .tier-badge {
+            background: var(--green-bg);
+            border: 1px solid var(--green-border);
+            color: var(--green);
+        }
+
+        .t-med .tier-badge {
+            background: var(--yellow-bg);
+            border: 1px solid var(--yellow-border);
+            color: var(--yellow);
+        }
+
+        .t-low .tier-badge {
+            background: var(--orange-bg);
+            border: 1px solid var(--orange-border);
+            color: var(--orange);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+            gap: 12px;
+        }
+
+        .college-card {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px 18px 14px;
+            transition: box-shadow .2s, transform .15s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: cardIn .25s ease both;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .college-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .c-high {
+            border-left: 4px solid var(--green);
+        }
+
+        .c-med {
+            border-left: 4px solid var(--yellow);
+        }
+
+        .c-low {
+            border-left: 4px solid var(--orange);
+        }
+
+        /* Card Head */
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .card-name {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            color: var(--ink);
+            line-height: 1.35;
+            flex: 1;
+        }
+
+        .card-region {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--ink3);
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2px 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .card-branch {
+            font-size: 12.5px;
+            color: var(--ink3);
+            line-height: 1.4;
+        }
+
+        .card-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--chip-bg);
+            color: var(--chip);
+            white-space: nowrap;
+        }
+
+        .chip-seat {
+            background: var(--chip-bg);
+            color: var(--chip);
+        }
+
+        .chip-type {
+            background: var(--surface2);
+            color: var(--ink3);
+            border: 1px solid var(--border);
+        }
+
+        /* Metrics */
+        .card-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .metric {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 9px 11px;
+        }
+
+        .metric-label {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--ink3);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .metric-val {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-delta {
+            font-size: 10.5px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .delta-pos {
+            color: var(--green);
+        }
+
+        .delta-neg {
+            color: var(--orange);
+        }
+
+        .delta-neu {
+            color: var(--yellow);
+        }
+
+        /* Prob Bar */
+        .prob-bar {
+            margin-top: 4px;
+        }
+
+        .prob-bar-track {
+            height: 4px;
+            background: var(--border);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .prob-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width .6s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .pb-high {
+            background: var(--green);
+        }
+
+        .pb-med {
+            background: var(--yellow);
+        }
+
+        .pb-low {
+            background: var(--orange);
+        }
+
+        .prob-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: var(--ink3);
+            margin-top: 4px;
+        }
+
+        /* Expand */
+        .card-more {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-more {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 11.5px;
+            color: var(--ink3);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 0;
+            transition: color .18s;
+        }
+
+        .btn-more:hover {
+            color: var(--brand);
+        }
+
+        .card-extra {
+            display: none;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-extra.open {
+            display: block;
+        }
+
+        .extra-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            font-size: 12.5px;
+            color: var(--ink3);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .extra-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .extra-row span:last-child {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--ink);
+            font-weight: 600;
+        }
+
+        .extra-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--blue);
+            text-decoration: none;
+            transition: opacity .15s;
+        }
+
+        .extra-link:hover {
+            opacity: .7;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--ink3);
+            grid-column: 1 / -1;
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 14px;
+        }
+
+        .no-results h3 {
+            font-family: 'Syne', 'Bricolage Grotesque', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--ink2);
+            margin-bottom: 6px;
+        }
+
+        /* Empty Tier */
+        .tier-empty {
+            text-align: center;
+            padding: 24px;
+            color: var(--ink3);
+            font-size: 13px;
+            background: var(--surface2);
+            border: 1.5px dashed var(--border2);
+            border-radius: var(--radius);
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            margin: 40px auto 16px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-msg {
+            text-align: center;
+            color: var(--ink3);
+            font-size: 14px;
+            padding-bottom: 30px;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .filter-bar label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--ink3);
+            white-space: nowrap;
+        }
+
+        .filter-sel {
+            background: var(--surface2);
+            border: 1.5px solid var(--border2);
+            border-radius: 9px;
+            padding: 8px 32px 8px 11px;
+            font-size: 13px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            cursor: pointer;
+            flex: 1;
+            min-width: 150px;
+            max-width: 240px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 9px center;
+            -webkit-appearance: none;
+            appearance: none;
+            transition: border-color .2s;
+        }
+
+        .filter-sel:focus {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(147, 197, 253, .25);
+        }
+
+        .filter-sel option {
+            background: var(--surface2);
+        }
+
+        .filter-count {
+            margin-left: auto;
+            font-size: 12px;
+            color: var(--ink3);
+            font-weight: 600;
+            font-family: var(--font-mono);
+            white-space: nowrap;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width: 640px) {
+            .wrap {
+                padding: 20px 14px 60px;
+            }
+
+            .hero {
+                margin-bottom: 24px;
+            }
+
+            .topbar {
+                padding: 0 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow-blob"></div>
+
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">CS</div>
+            <div>
+                <div class="brand-title">College Simplified</div>
+                <div class="brand-sub">AI Seat Eligibility Checker</div>
+            </div>
+        </div>
+        <div class="topbar-tag">MHT-CET 2026</div>
+    </header>
+
+    <div class="wrap">
+
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-eyebrow">
+                <span></span>
+                All India Seats · JEE Mains Data
+            </div>
+            <h1>Find Your <em>Dream Colleges</em><br>Before Counselling</h1>
+            <p>Enter your JEE Percentile or All India Rank to instantly see which colleges you're eligible for — ranked
+                by admission probability.</p>
+        </div>
+
+        <!-- INPUT CARD -->
+        <div class="input-card">
+            <div class="input-card-title">⚡ Check Your Eligibility</div>
+            <div class="input-card-sub">Enter either your JEE Percentile <strong>or</strong> your All India Merit rank —
+                or both for the most accurate prediction.</div>
+
+            <div class="mode-tabs">
+                <button class="mode-tab active" onclick="setMode('both')">Both</button>
+                <button class="mode-tab" onclick="setMode('percentile')">Percentile Only</button>
+                <button class="mode-tab" onclick="setMode('rank')">Rank Only</button>
+            </div>
+
+            <div id="inputArea">
+                <div class="input-row" id="bothRow">
+                    <div class="field" id="pctField">
+                        <label>JEE Percentile</label>
+                        <input type="number" id="inPct" step="0.0001" min="0" max="100" placeholder="e.g. 95.4321">
+                        <div class="field-hint">Between 0 – 100</div>
+                    </div>
+                    <div class="field-divider" id="divider" style="padding-top:28px">OR</div>
+                    <div class="field" id="rankField">
+                        <label>All India Merit Rank</label>
+                        <input type="number" id="inRank" min="1" placeholder="e.g. 8500">
+                        <div class="field-hint">Lower rank = better</div>
+                    </div>
+                    <button class="btn-check" onclick="runCheck()">Check →</button>
+                </div>
+            </div>
+
+            <div class="range-hint">
+                <div class="range-hint-item"><span class="rh-dot" style="background:var(--green)"></span><span>High
+                        Probability — Very likely to get admission</span></div>
+                <div class="range-hint-item"><span class="rh-dot" style="background:var(--yellow)"></span><span>Medium
+                        Probability — Borderline, apply strategically</span></div>
+                <div class="range-hint-item"><span class="rh-dot" style="background:var(--orange)"></span><span>Low
+                        Probability — Reach colleges, worth a try</span></div>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="resultSection">
+
+            <div id="scoreDisplay" class="score-display"></div>
+
+            <div class="result-summary">
+                <div class="summary-box s-green">
+                    <div class="summary-count" id="cntHigh">0</div>
+                    <div class="summary-label">✅ High Probability</div>
+                </div>
+                <div class="summary-box s-yellow">
+                    <div class="summary-count" id="cntMed">0</div>
+                    <div class="summary-label">⚡ Medium Probability</div>
+                </div>
+                <div class="summary-box s-orange">
+                    <div class="summary-count" id="cntLow">0</div>
+                    <div class="summary-label">🎯 Low Probability</div>
+                </div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar">
+                <label>Filter</label>
+                <select class="filter-sel" id="filterRegion" onchange="renderFiltered()">
+                    <option value="">All Regions</option>
+                </select>
+                <select class="filter-sel" id="filterBranch" onchange="renderFiltered()">
+                    <option value="">All Branches</option>
+                </select>
+                <div class="filter-count" id="filterCount"></div>
+            </div>
+
+            <!-- HIGH -->
+            <div class="tier t-high" id="tierHigh">
+                <div class="tier-header">
+                    <div class="tier-badge">✅ High Probability</div>
+                    <div class="tier-desc">Your score is comfortably above the cutoff. Strong chance of admission.</div>
+                    <div class="tier-count" id="lblHigh"></div>
+                </div>
+                <div class="cards-grid" id="cardsHigh"></div>
+            </div>
+
+            <!-- MEDIUM -->
+            <div class="tier t-med" id="tierMed">
+                <div class="tier-header">
+                    <div class="tier-badge">⚡ Medium Probability</div>
+                    <div class="tier-desc">Your score is very close to the cutoff. Admission is possible but not
+                        guaranteed.</div>
+                    <div class="tier-count" id="lblMed"></div>
+                </div>
+                <div class="cards-grid" id="cardsMed"></div>
+            </div>
+
+            <!-- LOW -->
+            <div class="tier t-low" id="tierLow">
+                <div class="tier-header">
+                    <div class="tier-badge">🎯 Low Probability</div>
+                    <div class="tier-desc">Cutoff is slightly above your score. These are reach colleges — still worth
+                        filling as a choice.</div>
+                    <div class="tier-count" id="lblLow"></div>
+                </div>
+                <div class="cards-grid" id="cardsLow"></div>
+            </div>
+
+        </div>
+
+        <div id="loadingState" style="display:none">
+            <div class="spinner"></div>
+            <div class="loading-msg">Loading college data…</div>
+        </div>
+
+    </div>
+
+    <script>
+        'use strict';
+
+        var JEE_DATA = [];
+        var DATA_READY = false;
+        var INPUT_MODE = 'both';
+        var RESULTS_HIGH = [], RESULTS_MED = [], RESULTS_LOW = [];
+
+        /* ── LOAD DATA ── */
+        function loadData() {
+            document.getElementById('loadingState').style.display = 'block';
+            fetch('jee_data.json')
+                .then(function (r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function (json) {
+                    var arr = [];
+                    if (Array.isArray(json)) arr = json;
+                    else {
+                        var key = Object.keys(json)[0];
+                        arr = json[key] || [];
+                    }
+                    JEE_DATA = arr.map(function (row) {
+                        var instRaw = (row['Institute Name'] || '').trim();
+                        var inst = instRaw.replace(/^\d+\s*-\s*/, '').trim();
+                        var branch = (row['Branch Name'] || '').replace(/\n/g, ' ').trim();
+                        var pct = parseFloat(row['JEE Percentile'] || 0) || 0;
+                        var airRaw = (row['All India Merit'] || '').trim();
+                        var rankMatch = airRaw.match(/^(\d+)/);
+                        var rank = rankMatch ? parseInt(rankMatch[1]) : 0;
+                        return {
+                            raw: row, inst: inst, branch: branch,
+                            pct: pct, rank: rank,
+                            code: row['College Code'] || '',
+                            seatType: row['Seat Type'] || 'AI',
+                            region: row['Region'] || '',
+                            type: row['Type'] || '',
+                            url: row['College Url'] || '',
+                            airRaw: airRaw,
+                            choiceCode: row['Choice Code'] || ''
+                        };
+                    }).filter(function (r) { return r.pct > 0; });
+                    DATA_READY = true;
+                    document.getElementById('loadingState').style.display = 'none';
+                })
+                .catch(function (err) {
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('loadingState').innerHTML =
+                        '<div style="text-align:center;padding:20px;color:#f87171">⚠️ Could not load jee_data.json — make sure the file is in the same folder.<br><small style="color:var(--ink3)">' + err.message + '</small></div>';
+                    document.getElementById('loadingState').style.display = 'block';
+                });
+        }
+
+        /* ── MODE ── */
+        function setMode(m) {
+            INPUT_MODE = m;
+            document.querySelectorAll('.mode-tab').forEach(function (el, i) {
+                el.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            var pf = document.getElementById('pctField');
+            var rf = document.getElementById('rankField');
+            var dv = document.getElementById('divider');
+            if (m === 'percentile') { pf.style.display = ''; rf.style.display = 'none'; dv.style.display = 'none'; }
+            else if (m === 'rank') { pf.style.display = 'none'; rf.style.display = ''; dv.style.display = 'none'; }
+            else { pf.style.display = ''; rf.style.display = ''; dv.style.display = ''; }
+        }
+
+        /* ── RUN CHECK ── */
+        function runCheck() {
+            if (!DATA_READY) { alert('Data is still loading. Please wait a moment.'); return; }
+
+            var pctVal = parseFloat(document.getElementById('inPct').value) || 0;
+            var rankVal = parseInt(document.getElementById('inRank').value) || 0;
+
+            if (INPUT_MODE === 'percentile' && !pctVal) { alert('Please enter your JEE Percentile.'); return; }
+            if (INPUT_MODE === 'rank' && !rankVal) { alert('Please enter your All India Merit Rank.'); return; }
+            if (INPUT_MODE === 'both' && !pctVal && !rankVal) { alert('Please enter at least one value.'); return; }
+
+            // Score display
+            var sd = document.getElementById('scoreDisplay');
+            sd.innerHTML = '';
+            if (pctVal) sd.innerHTML += '<div class="score-display-item"><span class="score-label">Your JEE Percentile</span><span class="score-value">' + pctVal.toFixed(4) + '</span></div>';
+            if (rankVal) sd.innerHTML += '<div class="score-display-item"><span class="score-label">Your AI Rank</span><span class="score-value">#' + rankVal.toLocaleString('en-IN') + '</span></div>';
+
+            // Categorize
+            RESULTS_HIGH = []; RESULTS_MED = []; RESULTS_LOW = [];
+
+            JEE_DATA.forEach(function (row) {
+                var tier = getTier(row, pctVal, rankVal);
+                if (tier === 'high') RESULTS_HIGH.push({ row: row, tier: 'high' });
+                else if (tier === 'med') RESULTS_MED.push({ row: row, tier: 'med' });
+                else if (tier === 'low') RESULTS_LOW.push({ row: row, tier: 'low' });
+            });
+
+            // Sort within tiers by percentile desc
+            function sortDesc(a, b) { return b.row.pct - a.row.pct; }
+            RESULTS_HIGH.sort(sortDesc);
+            RESULTS_MED.sort(sortDesc);
+            RESULTS_LOW.sort(sortDesc);
+
+            // Summary
+            document.getElementById('cntHigh').textContent = RESULTS_HIGH.length;
+            document.getElementById('cntMed').textContent = RESULTS_MED.length;
+            document.getElementById('cntLow').textContent = RESULTS_LOW.length;
+
+            buildFilters();
+            renderFiltered();
+            document.getElementById('resultSection').style.display = 'block';
+            document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        /* ── PROBABILITY TIER ── */
+        function getTier(row, userPct, userRank) {
+            var cutPct = row.pct;
+            var cutRank = row.rank;
+
+            // If user gave percentile — primary signal
+            if (userPct > 0 && cutPct > 0) {
+                var delta = userPct - cutPct;
+                if (delta >= 1.5) return 'high'; // user is 1.5+ pts above cutoff
+                if (delta >= -0.5) return 'med';  // within 0.5 pts below
+                if (delta >= -2.5) return 'low';  // up to 2.5 pts below
+                return null; // too far below
+            }
+            // If user gave rank — lower rank = better
+            if (userRank > 0 && cutRank > 0) {
+                var ratio = userRank / cutRank;
+                if (ratio <= 0.85) return 'high'; // 15% better rank
+                if (ratio <= 1.05) return 'med';  // within 5%
+                if (ratio <= 1.20) return 'low';  // within 20% worse
+                return null;
+            }
+            return null;
+        }
+
+        /* ── FILTERS ── */
+        function buildFilters() {
+            var all = RESULTS_HIGH.concat(RESULTS_MED).concat(RESULTS_LOW);
+
+            var regions = {}, branches = {};
+            all.forEach(function (item) {
+                var r = item.row.region; if (r) regions[r] = 1;
+                var b = item.row.branch; if (b) branches[b] = 1;
+            });
+
+            var rsel = document.getElementById('filterRegion');
+            rsel.innerHTML = '<option value="">All Regions</option>' +
+                Object.keys(regions).sort().map(function (r) {
+                    return '<option value="' + esc(r) + '">' + esc(r) + '</option>';
+                }).join('');
+
+            var bsel = document.getElementById('filterBranch');
+            bsel.innerHTML = '<option value="">All Branches</option>' +
+                Object.keys(branches).sort().map(function (b) {
+                    return '<option value="' + esc(b) + '">' + esc(b) + '</option>';
+                }).join('');
+        }
+
+        function renderFiltered() {
+            var fRegion = document.getElementById('filterRegion').value;
+            var fBranch = document.getElementById('filterBranch').value;
+
+            function filter(arr) {
+                return arr.filter(function (item) {
+                    if (fRegion && item.row.region !== fRegion) return false;
+                    if (fBranch && item.row.branch !== fBranch) return false;
+                    return true;
+                });
+            }
+
+            var h = filter(RESULTS_HIGH);
+            var m = filter(RESULTS_MED);
+            var l = filter(RESULTS_LOW);
+
+            document.getElementById('lblHigh').textContent = h.length + ' colleges';
+            document.getElementById('lblMed').textContent = m.length + ' colleges';
+            document.getElementById('lblLow').textContent = l.length + ' colleges';
+
+            var total = h.length + m.length + l.length;
+            document.getElementById('filterCount').textContent = total + ' matching';
+
+            renderTier('cardsHigh', h, 'high');
+            renderTier('cardsMed', m, 'med');
+            renderTier('cardsLow', l, 'low');
+
+            document.getElementById('tierHigh').style.display = (h.length || !fRegion && !fBranch) ? '' : 'none';
+            document.getElementById('tierMed').style.display = (m.length || !fRegion && !fBranch) ? '' : 'none';
+            document.getElementById('tierLow').style.display = (l.length || !fRegion && !fBranch) ? '' : 'none';
+        }
+
+        /* ── RENDER TIER ── */
+        function renderTier(containerId, items, tier) {
+            var container = document.getElementById(containerId);
+            if (!items.length) {
+                container.innerHTML = '<div class="tier-empty">No colleges in this category with current filters.</div>';
+                return;
+            }
+
+            var userPct = parseFloat(document.getElementById('inPct').value) || 0;
+            var userRank = parseInt(document.getElementById('inRank').value) || 0;
+
+            var html = '';
+            items.forEach(function (item, i) {
+                var row = item.row;
+                var delay = Math.min(i * 20, 400);
+
+                // Delta calculation
+                var deltaHTML = '';
+                if (userPct > 0 && row.pct > 0) {
+                    var d = userPct - row.pct;
+                    var sign = d >= 0 ? '+' : '';
+                    var cls = d >= 0 ? 'delta-pos' : (d >= -2 ? 'delta-neu' : 'delta-neg');
+                    deltaHTML = '<div class="metric-delta ' + cls + '">' + sign + d.toFixed(4) + ' pts</div>';
+                }
+                var rankDeltaHTML = '';
+                if (userRank > 0 && row.rank > 0) {
+                    var rd = row.rank - userRank;
+                    var rsign = rd >= 0 ? '+' : '';
+                    var rcls = rd >= 0 ? 'delta-pos' : 'delta-neg';
+                    rankDeltaHTML = '<div class="metric-delta ' + rcls + '">' + rsign + rd.toLocaleString('en-IN') + ' buffer</div>';
+                }
+
+                // Probability bar width
+                var barW = tier === 'high' ? 75 + Math.random() * 20 : tier === 'med' ? 40 + Math.random() * 25 : 15 + Math.random() * 25;
+                barW = Math.round(barW);
+
+                var cardId = 'card_' + tier + '_' + i;
+                var extraId = 'extra_' + tier + '_' + i;
+
+                html += '<div class="college-card c-' + tier + '" id="' + cardId + '" style="animation-delay:' + delay + 'ms">';
+                html += '<div class="card-head">';
+                html += '<div class="card-name">' + esc(row.inst) + '</div>';
+                if (row.region) html += '<div class="card-region">' + esc(row.region) + '</div>';
+                html += '</div>';
+                html += '<div class="card-branch">' + esc(row.branch) + '</div>';
+                html += '<div class="card-chips">';
+                if (row.seatType) html += '<span class="chip chip-seat">' + esc(row.seatType) + '</span>';
+                if (row.type) html += '<span class="chip chip-type">' + esc(row.type) + '</span>';
+                html += '</div>';
+                html += '<div class="card-metrics">';
+                html += '<div class="metric"><div class="metric-label">Cutoff Percentile</div><div class="metric-val">' + row.pct.toFixed(4) + '</div>' + deltaHTML + '</div>';
+                if (row.rank > 0) {
+                    html += '<div class="metric"><div class="metric-label">Cutoff AI Rank</div><div class="metric-val">#' + row.rank.toLocaleString('en-IN') + '</div>' + rankDeltaHTML + '</div>';
+                }
+                html += '</div>';
+                html += '<div class="prob-bar">';
+                html += '<div class="prob-bar-track"><div class="prob-bar-fill pb-' + tier + '" style="width:' + barW + '%"></div></div>';
+                html += '<div class="prob-label"><span>Admission Probability</span><span style="font-weight:700;color:var(--' + (tier === 'high' ? 'green' : tier === 'med' ? 'yellow' : 'orange') + ')">';
+                html += tier === 'high' ? 'HIGH' : tier === 'med' ? 'MEDIUM' : 'LOW';
+                html += '</span></div>';
+                html += '</div>';
+
+                // Expandable extra
+                html += '<div class="card-more"><button class="btn-more" onclick="toggleExtra(\'' + extraId + '\', this)">Details ▾</button></div>';
+                html += '<div class="card-extra" id="' + extraId + '">';
+                html += '<div class="extra-row"><span>College Code</span><span>' + esc(row.code) + '</span></div>';
+                html += '<div class="extra-row"><span>Choice Code</span><span>' + esc(row.choiceCode) + '</span></div>';
+                html += '<div class="extra-row"><span>All India Merit (Cutoff)</span><span>' + esc(row.airRaw) + '</span></div>';
+                if (row.url) html += '<a class="extra-link" href="' + esc(row.url) + '" target="_blank" rel="noopener">🔗 MahaCET Portal</a>';
+                html += '</div>';
+
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        /* ── TOGGLE EXTRA ── */
+        function toggleExtra(id, btn) {
+            var el = document.getElementById(id);
+            var open = el.classList.toggle('open');
+            btn.textContent = open ? 'Hide ▴' : 'Details ▾';
+        }
+
+        /* ── UTILS ── */
+        function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        /* ── BOOT ── */
+        loadData();
+    </script>
+</body>
+
+</html>

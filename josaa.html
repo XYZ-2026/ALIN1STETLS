@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JOSAA College Predictor — Find Your NIT / IIIT / GFTI</title>
+  <meta name="description"
+    content="Predict your JEE Main rank and find the best NIT, IIIT, and GFTI colleges based on your percentile, category, and preferences using real JOSAA cutoff data." />
+  <link rel="stylesheet" href="style-josaa.css" />
+</head>
+
+<body>
+
+  <!-- ═══════════ TOPBAR ═══════════ -->
+  <header class="topbar">
+    <div class="topbar-inner">
+
+      <!-- Brand -->
+      <a class="brand" href="#" onclick="showPage('home'); return false;">
+        <div class="brand-logo">JP</div>
+        <div class="brand-name">
+          JOSAA Predictor
+          <span>JEE Mains · 2025</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="topbar-nav" id="desktopNav">
+        <button class="nav-btn active" id="navHome" onclick="showPage('home')">🏠 Home</button>
+        <button class="nav-btn" id="navPredictor" onclick="showPage('predictor')" style="display:none;">🔮
+          Predictor</button>
+        <button class="nav-btn" id="navHistory" onclick="requireAuth('history')" style="display:none;">📋 My
+          Searches</button>
+      </nav>
+
+      <!-- Right side -->
+      <div class="topbar-right">
+        <!-- Theme toggle -->
+        <label class="toggle-wrap" title="Toggle dark mode">
+          <input type="checkbox" id="themeToggle" onchange="toggleTheme(this)" />
+          <div class="toggle-track">
+            <span>☀️</span><span>🌙</span>
+          </div>
+          <div class="toggle-knob"></div>
+        </label>
+
+
+
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ═══════════ TOAST ═══════════ -->
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <!-- ════════════════════════════════════════════════════════
+       PAGE: HOME
+       ════════════════════════════════════════════════════════ -->
+  <div class="page active" id="pageHome">
+    <div class="wrap">
+
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <h1>Find Your Dream College 🎓</h1>
+        <p>Enter your JEE Main percentile and get instant, data-driven predictions for <strong>NITs</strong>,
+          <strong>IIITs</strong>, and <strong>GFTIs</strong> — powered by real JOSAA cutoff data.
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-num">110+</span>
+            <span class="hero-stat-lbl">Institutes</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">7000+</span>
+            <span class="hero-stat-lbl">Programs</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-num">4</span>
+            <span class="hero-stat-lbl">Shift Types</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <h2>Get Started</h2>
+      <div class="tools-grid">
+        <div class="tool-card" onclick="showPage('predictor')">
+          <div class="tool-icon red">🔮</div>
+          <div>
+            <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;">College Predictor</div>
+            <div class="muted" style="margin-top:3px;">Enter percentile → get matching colleges instantly</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- How it works -->
+      <div class="card" style="margin-top:8px;">
+        <h2>How It Works</h2>
+        <div class="info-grid" style="margin-top:8px;">
+          <div class="info-block">
+            <div class="info-label">Step 1</div>
+            <div style="font-weight:700;font-size:13px;margin-top:4px;">Enter Percentile</div>
+            <div class="muted" style="margin-top:3px;font-size:12px;">Input your JEE Main percentile and shift
+              difficulty</div>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Step 2</div>
+            <div style="font-weight:700;font-size:13px;margin-top:4px;">Set Preferences</div>
+            <div class="muted" style="margin-top:3px;font-size:12px;">Choose category, gender, institute type & branch
+            </div>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Step 3</div>
+            <div style="font-weight:700;font-size:13px;margin-top:4px;">Get Predictions</div>
+            <div class="muted" style="margin-top:3px;font-size:12px;">AI maps your rank to real JOSAA cutoff data</div>
+          </div>
+          <div class="info-block">
+            <div class="info-label">Step 4</div>
+            <div style="font-weight:700;font-size:13px;margin-top:4px;">Choose Wisely</div>
+            <div class="muted" style="margin-top:3px;font-size:12px;">Filter Safe / Moderate / Dream colleges</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════════════════════
+       PAGE: PREDICTOR
+       ════════════════════════════════════════════════════════ -->
+  <div class="page" id="pagePredictor">
+    <div class="wrap-md">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">🔮 College Predictor</h1>
+          <p class="muted">Fill in your details to find matching colleges from the JOSAA dataset.</p>
+        </div>
+      </div>
+
+      <!-- PREDICTOR CARD -->
+      <div class="predictor-card">
+        <div class="predictor-card-head">
+          <span style="font-size:18px;">📝</span>
+          <div>
+            <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;">Enter Your Details</div>
+            <div class="muted" style="font-size:12px;">All fields are required for accurate predictions</div>
+          </div>
+        </div>
+
+        <div class="predictor-card-body">
+          <form id="predictorForm" onsubmit="handlePredict(event)">
+
+            <!-- Row 1: Rank -->
+            <div>
+              <label for="inRank">JEE Main All India Rank (AIR)</label>
+              <input type="number" id="inRank" placeholder="e.g. 15000" step="1" min="1" required />
+              <div class="help">Enter your All India Rank from your JEE Main result</div>
+            </div>
+
+            <!-- Row 2: Gender + Category + Home State -->
+            <div class="form-grid-3" style="margin-top:4px;">
+              <div>
+                <label for="inGender">Gender</label>
+                <select id="inGender" required>
+                  <option value="" disabled selected>Select gender</option>
+                  <option value="Gender-Neutral">Male (Gender-Neutral)</option>
+                  <option value="Female-only (including Supernumerary)">Female</option>
+                </select>
+              </div>
+              <div>
+                <label for="inCategory">Category</label>
+                <select id="inCategory" required>
+                  <option value="" disabled selected>Select category</option>
+                  <option value="OPEN">OPEN (General)</option>
+                  <option value="OBC-NCL">OBC-NCL</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="EWS">EWS</option>
+                </select>
+              </div>
+              <div>
+                <label for="inState">Home State</label>
+                <select id="inState" required>
+                  <option value="" disabled selected>Select state</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                  <option value="Assam">Assam</option>
+                  <option value="Bihar">Bihar</option>
+                  <option value="Chhattisgarh">Chhattisgarh</option>
+                  <option value="Goa">Goa</option>
+                  <option value="Gujarat">Gujarat</option>
+                  <option value="Haryana">Haryana</option>
+                  <option value="Himachal Pradesh">Himachal Pradesh</option>
+                  <option value="Jharkhand">Jharkhand</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Kerala">Kerala</option>
+                  <option value="Madhya Pradesh">Madhya Pradesh</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Manipur">Manipur</option>
+                  <option value="Meghalaya">Meghalaya</option>
+                  <option value="Mizoram">Mizoram</option>
+                  <option value="Nagaland">Nagaland</option>
+                  <option value="Odisha">Odisha</option>
+                  <option value="Punjab">Punjab</option>
+                  <option value="Rajasthan">Rajasthan</option>
+                  <option value="Sikkim">Sikkim</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Tripura">Tripura</option>
+                  <option value="Uttar Pradesh">Uttar Pradesh</option>
+                  <option value="Uttarakhand">Uttarakhand</option>
+                  <option value="West Bengal">West Bengal</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Puducherry">Puducherry</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Row 3: Branch Group -->
+            <div style="margin-top:4px;">
+              <label for="inBranch">Branch Group</label>
+              <select id="inBranch" required>
+                <option value="" disabled selected>Select branch group</option>
+                <option value="computer">💻 Computer Branches (CSE, IT, AI, Data Science)</option>
+                <option value="electronics">📡 Electronics Branches (ECE, EEE, ENI)</option>
+                <option value="core">⚙️ Core Branches (Mechanical, Civil, Chemical)</option>
+                <option value="others">🔬 Others (All remaining branches)</option>
+              </select>
+            </div>
+
+            <!-- Row 4: Institute Type checkboxes -->
+            <div style="margin-top:8px;">
+              <label>Institute Type</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="instType" value="NIT" checked />
+                  🏛️ NIT
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="instType" value="IIIT" checked />
+                  💻 IIIT
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="instType" value="GFTI" />
+                  🏗️ GFTI
+                </label>
+              </div>
+              <div class="help">Select one or more institute types to include in results</div>
+            </div>
+
+            <div id="predictErr" class="err" style="display:none;"></div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="predictBtn"
+              style="margin-top:20px;padding:14px;">
+              🔮 Predict My Colleges
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ═══════ RESULTS ═══════ -->
+      <div id="resultsSection" style="display:none;">
+
+        <!-- Summary bar -->
+        <div class="result-summary-stat">
+          <div class="rss-label">Your Rank</div>
+          <div class="rss-value" id="rssRank">—</div>
+        </div>
+        <div class="result-summary-stat">
+          <div class="rss-label">Colleges Found</div>
+          <div class="rss-value" id="rssCount">—</div>
+        </div>
+      </div>
+
+      <!-- Filter chips -->
+      <div class="filter-bar">
+        <span class="filter-bar-label">Filter:</span>
+        <button class="fchip active" data-f="all" onclick="applyFilter('all', this)">All</button>
+        <button class="fchip" data-f="safe" onclick="applyFilter('safe', this)">✅ Safe</button>
+        <button class="fchip" data-f="moderate" onclick="applyFilter('moderate', this)">⚡ Moderate</button>
+        <button class="fchip" data-f="dream" onclick="applyFilter('dream', this)">🌟 Dream</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportResults()" style="margin-left:auto;">⬇️ Export</button>
+      </div>
+
+      <!-- Cards grid -->
+      <div class="col-grid" id="resultsGrid"></div>
+
+      <!-- Empty state -->
+      <div class="empty" id="emptyState" style="display:none;">
+        <div class="empty-icon">😔</div>
+        <h3>No Colleges Found</h3>
+        <p>Try adjusting your filters — widen institute type, branch, or category.</p>
+      </div>
+
+    </div>
+
+  </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       PAGE: HISTORY
+       ════════════════════════════════════════════════════════ -->
+  <div class="page" id="pageHistory">
+    <div class="wrap-md">
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">📋 My Searches</h1>
+          <p class="muted">Your past prediction searches are saved here.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="clearHistory()">🗑️ Clear All</button>
+      </div>
+
+      <div id="historyList">
+        <div class="empty">
+          <div class="empty-icon">📭</div>
+          <h3>No searches yet</h3>
+          <p>Run your first prediction to see results here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       LOADING OVERLAY (full-page spinner)
+       ════════════════════════════════════════════════════════ -->
+  <div class="overlay" id="loadingOverlay">
+    <div class="modal" style="max-width:260px;text-align:center;padding:32px 24px;">
+      <div class="spinner" style="margin:0 auto 16px;"></div>
+      <div style="font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;">Analysing Colleges…</div>
+      <div class="muted" style="margin-top:6px;font-size:13px;">Matching you to JOSAA data</div>
+    </div>
+  </div>
+
+  <script src="script-josaa.js"></script>
+</body>
+
+</html>

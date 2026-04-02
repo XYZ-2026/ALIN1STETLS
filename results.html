@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prediction Results – College Predictor</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+    rel="stylesheet">
+
+  <!-- PDF libs -->
+  <script src="shared_auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    /* ── Theme tokens ── */
+    :root {
+      --brand: #e6403a;
+      --brand-600: #d8352e;
+      --brand-soft: #fff1f0;
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --stroke: #e5e7eb;
+      --ink: #111827;
+      --ink2: #374151;
+      --muted: #6b7280;
+      --row-even: #f9fafb;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .06);
+      --th-bg: #ffffff;
+      --link: #2563eb;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --stroke: #2d3148;
+      --ink: #f0f2ff;
+      --ink2: #c5c9e0;
+      --muted: #7b82a8;
+      --row-even: #1f2235;
+      --shadow: 0 10px 30px rgba(0, 0, 0, .3);
+      --th-bg: #1a1d27;
+      --link: #60a5fa;
+      --brand-soft: rgba(230, 64, 58, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--card);
+      border-bottom: 1px solid var(--stroke);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: var(--ink);
+      font-family: Poppins, sans-serif;
+    }
+
+    .badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 4px 14px rgba(230, 64, 58, .3);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ── Theme toggle ── */
+    .theme-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      background: var(--card);
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: .2s background, .2s border-color;
+    }
+
+    .theme-btn:hover {
+      background: var(--row-even);
+    }
+
+    .theme-btn svg {
+      display: block;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid rgba(230, 64, 58, .2);
+      transition: .15s;
+    }
+
+    .back-btn:hover {
+      filter: brightness(.97);
+    }
+
+    /* ── Page wrap ── */
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+      font-family: Poppins, sans-serif;
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 700;
+      margin: 0 0 6px;
+      color: var(--ink);
+    }
+
+    .result-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      background: var(--brand-soft);
+      color: var(--brand);
+      border: 1px solid rgba(230, 64, 58, .2);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 12.5px;
+    }
+
+    /* ── Student card ── */
+    .student-card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      color: var(--ink2);
+      display: none;
+    }
+
+    /* ── Table card ── */
+    .table-card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .table-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    thead th {
+      background: var(--th-bg);
+      padding: 11px 12px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--stroke);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--stroke);
+      color: var(--ink2);
+      vertical-align: top;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--row-even);
+    }
+
+    tbody tr:hover {
+      background: var(--brand-soft);
+    }
+
+    .college-code {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--brand);
+      background: var(--brand-soft);
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(230, 64, 58, .15);
+      white-space: nowrap;
+    }
+
+    .inst-name {
+      max-width: 240px;
+      line-height: 1.5;
+    }
+
+    .branch-name {
+      max-width: 200px;
+      line-height: 1.5;
+    }
+
+    .rank-val {
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .pct-val {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .visit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 11px;
+      border-radius: 7px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: .15s;
+    }
+
+    .visit-btn:hover {
+      background: var(--brand-600);
+    }
+
+    .visit-btn svg {
+      flex-shrink: 0;
+    }
+
+    .no-url {
+      font-size: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* ── Responsive: rich cards on mobile ── */
+    #cardsContainer {
+      display: none;
+      padding: 16px;
+    }
+
+    .college-card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, .06);
+      transition: box-shadow .2s;
+    }
+
+    .college-card:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .10);
+    }
+
+    .cc-header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--stroke);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .cc-index {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      background: var(--brand-soft);
+      color: var(--brand);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .cc-title-block {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cc-institute {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .cc-branch {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .cc-body {
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px 8px;
+      border-bottom: 1px solid var(--stroke);
+    }
+
+    .cc-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .cc-stat-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+    }
+
+    .cc-stat-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .cc-stat-value.rank {
+      color: var(--brand);
+    }
+
+    .cc-footer {
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .cc-codes {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    @media (max-width:700px) {
+      .table-scroll {
+        display: none;
+      }
+
+      #cardsContainer {
+        display: block;
+      }
+    }
+
+    /* ── Action bar ── */
+    .action-bar {
+      padding: 14px 18px;
+      border-top: 1px solid var(--stroke);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: .2s transform, .2s background;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(230, 64, 58, .25);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-600);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--ink2);
+      border: 1px solid var(--stroke);
+    }
+
+    .btn-outline:hover {
+      background: var(--row-even);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-badge">
+        <div class="badge">CS</div>
+        <span>College Predictor</span>
+      </div>
+      <div class="topbar-actions">
+        <button class="theme-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+          <svg id="themeIcon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+        </button>
+        <a class="back-btn" href="air.html">← Back to Predictor</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <div class="page-header">
+      <h1>Your College Predictions</h1>
+      <div class="result-meta">
+        <span class="pill" id="countPill">0 colleges found</span>
+      </div>
+    </div>
+
+    <div class="student-card" id="studentCard"></div>
+
+    <div class="table-card">
+      <div class="table-toolbar">
+        <span class="table-title">Matched Colleges</span>
+      </div>
+      <div class="table-scroll">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>College Code</th>
+              <th>Choice Code</th>
+              <th>Institute</th>
+              <th>Branch</th>
+              <th>Merit Exam</th>
+              <th>Min. Rank</th>
+              <th>Percentile</th>
+              <th>Visit</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="cardsContainer"></div>
+      <div class="action-bar">
+        <button class="btn btn-primary" onclick="downloadPDF()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M12 16V4M6 10l6 6 6-6" />
+            <path d="M4 20h16" stroke-linecap="round" />
+          </svg>
+          Download PDF
+        </button>
+        <button class="btn btn-outline" onclick="window.location.href='index.html'">
+          ← New Search
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ── Theme toggle ── */
+    const html = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    const MOON_PATH = `<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>`;
+    const SUN_PATH = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeIcon.innerHTML = theme === 'dark' ? SUN_PATH : MOON_PATH;
+    }
+
+    const savedTheme = localStorage.getItem('cs_theme') || 'light';
+    applyTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('cs_theme', next);
+      applyTheme(next);
+    });
+
+    /* ── Student details ── */
+    function requireDetailsOrRedirect() {
+      const session = getSession();
+      if (!session || !session.name) {
+        alert("Please log in first.");
+        location.replace("auth.html");
+        return false;
+      }
+      const card = document.getElementById('studentCard');
+      card.style.display = 'block';
+      card.innerHTML = `👋 <strong>${session.name}</strong> &nbsp;·&nbsp; ${session.email}`;
+      return true;
+    }
+    /* ── Load & render results ── */
+    function loadResultsFromStorage() {
+      const raw = localStorage.getItem("results");
+      let results = [];
+      try { if (raw) results = JSON.parse(raw); } catch { results = []; }
+
+      const tbody = document.querySelector("#resultsTable tbody");
+      const cardsWrap = document.getElementById('cardsContainer');
+      const countPill = document.getElementById('countPill');
+      countPill.textContent = results.length + ' college' + (results.length !== 1 ? 's' : '') + ' found';
+
+      if (!results.length) {
+        tbody.innerHTML = "<tr><td colspan='9' style='text-align:center;padding:30px;color:var(--muted)'>No results found. Please run the predictor again.</td></tr>";
+        cardsWrap.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:14px">No results found. Please run the predictor again.</div>`;
+        return;
+      }
+
+      const VISIT_ICON = `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+
+      /* ── Desktop table rows ── */
+      tbody.innerHTML = results.map((r, i) => {
+        const collegeCode = r["College Code"] || "—";
+        const choiceCode = r["Choice Code"] || "—";
+        const institute = (r["Institute Name"] || "—").replace(/\n/g, ' ').trim();
+        const branch = (r["Branch Name"] || "—").replace(/\n/g, ' ').trim();
+        const merit = r["Merit Exam"] || "—";
+        const rank = r["All India Merit"] ? r["All India Merit"].split(" ")[0] : "—";
+        const percentile = r["JEE Percentile"] || "—";
+        const url = r["College Url"] || "";
+
+        const visitCell = url
+          ? `<a class="visit-btn" href="${url}" target="_blank" rel="noopener">${VISIT_ICON} Visit</a>`
+          : `<span class="no-url">N/A</span>`;
+
+        return `<tr>
+        <td data-label="#" style="color:var(--muted);font-size:12px">${i + 1}</td>
+        <td data-label="College Code"><span class="college-code">${collegeCode}</span></td>
+        <td data-label="Choice Code" style="font-size:12px;color:var(--muted)">${choiceCode}</td>
+        <td data-label="Institute" class="inst-name">${institute}</td>
+        <td data-label="Branch" class="branch-name">${branch}</td>
+        <td data-label="Merit">${merit}</td>
+        <td data-label="Min. Rank" class="rank-val">${rank}</td>
+        <td data-label="Percentile" class="pct-val">${percentile}</td>
+        <td data-label="Visit">${visitCell}</td>
+      </tr>`;
+      }).join('');
+
+      /* ── Mobile cards ── */
+      cardsWrap.innerHTML = results.map((r, i) => {
+        const collegeCode = r["College Code"] || "—";
+        const choiceCode = r["Choice Code"] || "—";
+        const institute = (r["Institute Name"] || "—").replace(/\n/g, ' ').trim()
+          .replace(/^\d+\s*[-–]\s*/, ''); // strip leading code from name
+        const branch = (r["Branch Name"] || "—").replace(/\n/g, ' ').trim();
+        const merit = r["Merit Exam"] || "—";
+        const rank = r["All India Merit"] ? r["All India Merit"].split(" ")[0] : "—";
+        const percentile = r["JEE Percentile"] ? parseFloat(r["JEE Percentile"]).toFixed(2) : "—";
+        const seatType = r["Seat Type"] || "—";
+        const region = r["Region"] || "";
+        const url = r["College Url"] || "";
+
+        const visitBtn = url
+          ? `<a class="visit-btn" href="${url}" target="_blank" rel="noopener" style="padding:7px 14px;font-size:13px;">${VISIT_ICON} Visit College </a>`
+          : `<span class="no-url">No website available</span>`;
+
+        const regionBadge = region
+          ? `<span style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:4px;">
+             <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+             ${region}
+           </span>`
+          : '';
+
+        return `
+        <div class="college-card">
+          <div class="cc-header">
+            <div class="cc-index">${i + 1}</div>
+            <div class="cc-title-block">
+              <div class="cc-institute">${institute}</div>
+              <div class="cc-branch">${branch}</div>
+              ${regionBadge}
+            </div>
+          </div>
+          <div class="cc-body">
+            <div class="cc-stat">
+              <span class="cc-stat-label">Min. Rank</span>
+              <span class="cc-stat-value rank">${rank}</span>
+            </div>
+            <div class="cc-stat">
+              <span class="cc-stat-label">Percentile</span>
+              <span class="cc-stat-value">${percentile}</span>
+            </div>
+            <div class="cc-stat">
+              <span class="cc-stat-label">Merit</span>
+              <span class="cc-stat-value">${merit}</span>
+            </div>
+            <div class="cc-stat">
+              <span class="cc-stat-label">Seat Type</span>
+              <span class="cc-stat-value">${seatType}</span>
+            </div>
+            <div class="cc-stat">
+              <span class="cc-stat-label">College Code</span>
+              <span class="cc-stat-value"><span class="college-code" style="font-size:11px">${collegeCode}</span></span>
+            </div>
+            <div class="cc-stat">
+              <span class="cc-stat-label">Choice Code</span>
+              <span class="cc-stat-value" style="font-size:12px;color:var(--muted)">${choiceCode}</span>
+            </div>
+          </div>
+          <div class="cc-footer">
+            ${visitBtn}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    /* ── PDF download (with clickable URL as text) ── */
+    async function downloadPDF() {
+      try {
+        const raw = localStorage.getItem("results");
+        let results = [];
+        try { if (raw) results = JSON.parse(raw); } catch { }
+
+        if (!results.length) { alert("No data to export."); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+
+        // Header
+        doc.setFillColor(230, 64, 58);
+        doc.rect(0, 0, doc.internal.pageSize.width, 46, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont(undefined, 'bold');
+        doc.text("All India Rank – College Prediction Results", 36, 30);
+
+        // Student info
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        const det = getSession();
+        if (det) {
+          doc.text(`Student: ${det.name}   |   ${det.email}`, 36, 58);
+        }
+        doc.text(`Generated: ${new Date().toLocaleString('en-IN')}`, doc.internal.pageSize.width - 36, 58, { align: 'right' });
+
+        // Table rows — URL as plain text, not button
+        const bodyRows = results.map((r, i) => [
+          i + 1,
+          r["College Code"] || "—",
+          r["Choice Code"] || "—",
+          (r["Institute Name"] || "—").replace(/\n/g, ' ').trim(),
+          (r["Branch Name"] || "—").replace(/\n/g, ' ').trim(),
+          r["Merit Exam"] || "—",
+          r["All India Merit"] ? r["All India Merit"].split(" ")[0] : "—",
+          r["JEE Percentile"] || "—",
+          r["College Url"] || "—"
+        ]);
+
+        doc.autoTable({
+          startY: 70,
+          head: [["#", "College Code", "Choice Code", "Institute", "Branch", "Merit", "Min. Rank", "Percentile", "College URL"]],
+          body: bodyRows,
+          theme: "grid",
+          margin: { left: 30, right: 30 },
+          styles: { fontSize: 7.5, cellPadding: 5, overflow: 'linebreak' },
+          headStyles: { fillColor: [230, 64, 58], textColor: 255, fontStyle: 'bold', fontSize: 8 },
+          alternateRowStyles: { fillColor: [249, 250, 251] },
+          columnStyles: {
+            0: { cellWidth: 18 },
+            1: { cellWidth: 48 },
+            2: { cellWidth: 62 },
+            3: { cellWidth: 130 },
+            4: { cellWidth: 110 },
+            5: { cellWidth: 38 },
+            6: { cellWidth: 48 },
+            7: { cellWidth: 52 },
+            8: { cellWidth: 120, textColor: [37, 99, 235] }
+          },
+          // Make URL column clickable in PDF
+          didDrawCell: (hookData) => {
+            if (hookData.section === 'body' && hookData.column.index === 8) {
+              const url = hookData.cell.raw;
+              if (url && url !== '—' && url.startsWith('http')) {
+                doc.link(
+                  hookData.cell.x, hookData.cell.y,
+                  hookData.cell.width, hookData.cell.height,
+                  { url }
+                );
+              }
+            }
+          }
+        });
+
+        // Footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= pageCount; p++) {
+          doc.setPage(p);
+          doc.setFontSize(8);
+          doc.setTextColor(150);
+          doc.text(
+            `Page ${p} of ${pageCount}  ·  Concept Simplified College Predictor`,
+            doc.internal.pageSize.width / 2,
+            doc.internal.pageSize.height - 14,
+            { align: 'center' }
+          );
+        }
+
+        const blob = doc.output("blob");
+        const url = URL.createObjectURL(blob);
+        const a = Object.assign(document.createElement("a"), {
+          href: url,
+          download: "College_Prediction_Results.pdf"
+        });
+        a.click();
+        URL.revokeObjectURL(url);
+
+      } catch (err) {
+        alert("PDF generation failed: " + err.message);
+        console.error(err);
+      }
+    }
+
+    /* ── Boot ── */
+    initAuth({ requireLogin: false });
+    if (requireDetailsOrRedirect()) {
+      loadResultsFromStorage();
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All India Rank College Predictor</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ── Theme tokens ── */
+    :root {
+      --brand: #e6403a;
+      --brand-600: #d8352e;
+      --brand-soft: #fff1f0;
+      --ink: #111827;
+      --ink2: #374151;
+      --muted: #6b7280;
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --stroke: #e5e7eb;
+      --ring: #cfe2ff;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --stroke: #2d3148;
+      --ink: #f0f2ff;
+      --ink2: #c5c9e0;
+      --muted: #7b82a8;
+      --ring: #1e3a5f;
+      --brand-soft: rgba(230, 64, 58, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background .25s, color .25s;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--card);
+      border-bottom: 1px solid var(--stroke);
+      backdrop-filter: blur(8px);
+      transition: background .25s, border-color .25s;
+    }
+
+    .topbar-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .badge {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--brand);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-family: Poppins, Inter, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 20px rgba(230, 64, 58, .25);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .site-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid rgba(230, 64, 58, .2);
+      transition: .15s;
+    }
+
+    .site-link:hover {
+      filter: brightness(.97);
+    }
+
+    /* ── Theme toggle ── */
+    .theme-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--stroke);
+      background: var(--card);
+      color: var(--ink);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+      transition: .2s background, .2s border-color;
+    }
+
+    .theme-btn:hover {
+      background: var(--bg);
+    }
+
+    /* ── Layout ── */
+    .wrap {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      box-shadow: 0 20px 60px rgba(16, 24, 40, .06);
+      padding: 26px;
+      transition: background .25s, border-color .25s;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width:900px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-family: Poppins, Inter, sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: .2px;
+      color: var(--ink);
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--ink2);
+      display: block;
+      margin: 10px 0 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--stroke);
+      background: var(--card);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--ink);
+      outline: none;
+      transition: border .2s, box-shadow .2s, background .2s;
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #bcd3ff;
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+
+    [data-theme="dark"] select option {
+      background: #1a1d27;
+    }
+
+    .help {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: .2s transform, .2s box-shadow, .2s background;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 10px 18px rgba(230, 64, 58, .25);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-600);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #3b82f6;
+      border: none;
+    }
+
+    .btn[disabled] {
+      opacity: .7;
+      cursor: not-allowed;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .greeting {
+      border: 1px dashed rgba(230, 64, 58, .3);
+      background: var(--brand-soft);
+      color: var(--brand);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 10px 0 16px;
+      font-weight: 600;
+    }
+
+    .radio-row {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .radio-row label {
+      margin: 0;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    @media (max-width:900px) {
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* ── Branch multi-select ── */
+    .branch-dropdown-wrap {
+      position: relative;
+    }
+
+    .branch-trigger {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--stroke);
+      background: var(--card);
+      border-radius: 10px;
+      font-size: 15px;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: border .2s, box-shadow .2s;
+      gap: 8px;
+    }
+
+    #branchTriggerText {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .branch-trigger:focus,
+    .branch-trigger.open {
+      border-color: #bcd3ff;
+      box-shadow: 0 0 0 4px var(--ring);
+    }
+
+    .branch-trigger .arrow {
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform .2s;
+    }
+
+    .branch-trigger.open .arrow {
+      transform: rotate(180deg);
+    }
+
+    .branch-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 10px;
+      box-shadow: 0 12px 32px rgba(16, 24, 40, .12);
+      z-index: 100;
+      max-height: 240px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .branch-panel.open {
+      display: block;
+    }
+
+    .branch-option {
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--ink2);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: background .15s;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .branch-option:hover {
+      background: var(--bg);
+    }
+
+    .branch-option.selected {
+      color: var(--brand);
+      font-weight: 600;
+      background: var(--brand-soft);
+    }
+
+    .branch-option.all-opt {
+      border-bottom: 1px solid var(--stroke);
+      font-weight: 600;
+    }
+
+    .branch-option.disabled-opt {
+      opacity: .4;
+      pointer-events: none;
+    }
+
+    .branch-option .chk {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid var(--stroke);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .branch-option.selected .chk {
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .branch-option .chk::after {
+      content: '';
+      display: none;
+      width: 5px;
+      height: 9px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    .branch-option.selected .chk::after {
+      display: block;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      min-height: 0;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--brand-soft);
+      color: var(--brand);
+      border: 1px solid rgba(230, 64, 58, .2);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+
+    .chip-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--brand);
+      font-size: 15px;
+      line-height: 1;
+      padding: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .chip-remove:hover {
+      color: var(--brand-600);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-badge">
+        <div class="badge">CS</div>
+        <div>All India Rank College Predictor</div>
+      </div>
+      <div class="topbar-right">
+        <button class="theme-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
+          <svg id="themeIcon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+        </button>
+        <a class="site-link" href="#" onclick="return false;">Concept Simplified</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+
+    <!-- PREDICTOR -->
+    <section id="predictorSection" class="card" style="display:none;">
+      <div class="header-row">
+        <h1>Find Your Best-Fit Colleges</h1>
+        <button id="editDetailsBtn" class="btn btn-ghost" type="button">Edit details</button>
+      </div>
+
+      <div id="helloBanner" class="greeting" style="display:none;"></div>
+
+      <!-- Method -->
+      <div style="margin-top:8px">
+        <label>Prediction Method</label>
+        <div class="radio-row">
+          <label><input type="radio" name="method" value="Percentile" checked> Exam Percentile</label>
+          <label><input type="radio" name="method" value="Rank"> All India Merit Rank</label>
+        </div>
+      </div>
+
+      <!-- Score -->
+      <div style="margin-top:10px">
+        <label for="score"><span id="scoreLabel">Enter Percentile</span></label>
+        <input type="text" id="score" placeholder="e.g., 96.4">
+      </div>
+
+      <!-- Branch multi-select -->
+      <div style="margin-top:10px">
+        <label>Select Branch(es)</label>
+        <div class="branch-dropdown-wrap">
+          <div class="branch-trigger" id="branchTrigger" tabindex="0">
+            <span id="branchTriggerText">All Branches</span>
+            <span class="arrow">▼</span>
+          </div>
+          <div class="branch-panel" id="branchPanel"></div>
+        </div>
+        <div class="chips-row" id="branchChips"></div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn btn-primary" type="button" onclick="predictCollege()">Show results</button>
+      </div>
+    </section>
+
+  </main>
+  <script src="shared_auth.js"></script>
+  <script>
+
+    /* ── Theme toggle ── */
+    const html = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    const MOON_PATH = `<path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>`;
+    const SUN_PATH = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+
+    function applyTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      themeIcon.innerHTML = theme === 'dark' ? SUN_PATH : MOON_PATH;
+    }
+
+    const savedTheme = localStorage.getItem('cs_theme') || 'light';
+    applyTheme(savedTheme);
+
+    themeBtn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('cs_theme', next);
+      applyTheme(next);
+    });
+
+    /* ── Config ── */
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxuvG2sjXREA4bI6Aovld8eEXYWwuN6C46fK50MI6O3H_Jw0meMOAwBTTHxf8eLnKToBg/exec";
+
+
+
+
+
+    function logPrediction(method, scoreInput, branch) {
+      const details = getSession();
+      if (!details) return;
+      fetch(WEBAPP_URL, {
+        method: 'POST', mode: 'no-cors',
+        body: JSON.stringify({
+          ...details, source: "all-india-prediction", ua: navigator.userAgent,
+          exam: "jee", method, inputValue: scoreInput, branch
+        })
+      });
+    }
+
+    /* ── Branch multi-select ── */
+    let selectedBranches = new Set();
+    let allBranchNames = [];
+
+    function renderBranchPanel() {
+      const panel = document.getElementById('branchPanel');
+      const allActive = selectedBranches.has('__all__');
+      panel.innerHTML = '';
+
+      const allRow = document.createElement('div');
+      allRow.className = 'branch-option all-opt' + (allActive ? ' selected' : '');
+      allRow.innerHTML = `<span class="chk"></span> All Branches`;
+      allRow.onclick = () => {
+        if (allActive) selectedBranches.clear();
+        else { selectedBranches.clear(); selectedBranches.add('__all__'); }
+        renderBranchPanel(); renderBranchChips(); updateTriggerLabel();
+      };
+      panel.appendChild(allRow);
+
+      allBranchNames.forEach(b => {
+        const isSel = !allActive && selectedBranches.has(b);
+        const row = document.createElement('div');
+        row.className = 'branch-option' +
+          (isSel ? ' selected' : '') +
+          (allActive ? ' disabled-opt' : '');
+        row.innerHTML = `<span class="chk"></span> ${b}`;
+        row.onclick = () => {
+          if (selectedBranches.has(b)) selectedBranches.delete(b);
+          else selectedBranches.add(b);
+          renderBranchPanel(); renderBranchChips(); updateTriggerLabel();
+        };
+        panel.appendChild(row);
+      });
+    }
+
+    function renderBranchChips() {
+      const container = document.getElementById('branchChips');
+      container.innerHTML = '';
+      const items = selectedBranches.has('__all__')
+        ? [{ key: '__all__', label: 'All Branches' }]
+        : Array.from(selectedBranches).map(b => ({ key: b, label: b }));
+
+      items.forEach(({ key, label }) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `${label}
+      <button class="chip-remove" title="Remove" onclick="removeBranchChip('${key.replace(/'/g, "\\'")}')">×</button>`;
+        container.appendChild(chip);
+      });
+    }
+
+    function removeBranchChip(key) {
+      if (key === '__all__') selectedBranches.clear();
+      else selectedBranches.delete(key);
+      renderBranchPanel(); renderBranchChips(); updateTriggerLabel();
+    }
+
+    function updateTriggerLabel() {
+      const label = document.getElementById('branchTriggerText');
+      if (selectedBranches.has('__all__') || selectedBranches.size === 0) {
+        label.textContent = 'All Branches';
+      } else if (selectedBranches.size === 1) {
+        label.textContent = Array.from(selectedBranches)[0];
+      } else {
+        label.textContent = `${selectedBranches.size} branches selected`;
+      }
+    }
+
+    function initBranchDropdown() {
+      const trigger = document.getElementById('branchTrigger');
+      const panel = document.getElementById('branchPanel');
+
+      trigger.addEventListener('click', () => {
+        const isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        trigger.classList.toggle('open', !isOpen);
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!trigger.contains(e.target) && !panel.contains(e.target)) {
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+        }
+      });
+
+      trigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          panel.classList.remove('open');
+          trigger.classList.remove('open');
+        }
+      });
+    }
+
+    /* ── Data ── */
+    let data = null;
+
+    async function loadData() {
+      try {
+        const response = await fetch('jee_data.json');
+        data = await response.json();
+        populateBranches();
+      } catch (e) {
+        console.error(e);
+        alert("Failed to load college data");
+      }
+    }
+
+    function populateBranches() {
+      if (!data) return;
+      const dataset = data["Cleaned_MHT-CET_Cutoff_Data (1)"] || [];
+      const branchSet = new Set();
+      dataset.forEach(college => {
+        if (college["Branch Name"]) branchSet.add(college["Branch Name"].replace(/\n/g, ' ').trim());
+      });
+      allBranchNames = Array.from(branchSet).sort();
+      renderBranchPanel();
+    }
+
+    function parseRank(val) {
+      if (!val) return NaN;
+      return parseInt(String(val).split(" ")[0]);
+    }
+
+    function predictCollege() {
+      if (!data) { alert("Data loading..."); return; }
+
+      const method = document.querySelector('input[name="method"]:checked').value;
+      const scoreInput = document.getElementById("score").value.trim();
+
+      if (!scoreInput) { alert("Enter score"); return; }
+      const score = parseFloat(scoreInput);
+      if (isNaN(score)) { alert("Invalid number"); return; }
+
+      const isAllBranches = selectedBranches.has('__all__') || selectedBranches.size === 0;
+      const branchFilter = isAllBranches ? null : Array.from(selectedBranches);
+
+      let dataset = data["Cleaned_MHT-CET_Cutoff_Data (1)"] || [];
+      dataset = dataset.filter(row => (row["Merit Exam"] || "").toUpperCase() === "JEE");
+
+      if (method === "Percentile") {
+        dataset = dataset.filter(row => {
+          const pct = parseFloat(row["JEE Percentile"]);
+          return !isNaN(pct) && pct <= score;
+        });
+        dataset.sort((a, b) => parseFloat(b["JEE Percentile"]) - parseFloat(a["JEE Percentile"]));
+      } else {
+        dataset = dataset.filter(row => {
+          const rank = parseRank(row["All India Merit"]);
+          return !isNaN(rank) && rank <= score;
+        });
+        dataset.sort((a, b) => parseRank(b["All India Merit"]) - parseRank(a["All India Merit"]));
+      }
+
+      if (branchFilter) {
+        dataset = dataset.filter(row => {
+          const clean = row["Branch Name"].replace(/\n/g, ' ').trim();
+          return branchFilter.includes(clean);
+        });
+      }
+
+      dataset = dataset.slice(0, 25);
+      if (dataset.length === 0) { alert("No colleges found"); return; }
+
+      logPrediction(method, scoreInput, isAllBranches ? 'All Branches' : branchFilter.join(', '));
+      localStorage.setItem("results", JSON.stringify(dataset));
+      window.location.href = "results.html";
+    }
+
+    function showPredictor(details) {
+      const banner = document.getElementById('helloBanner');
+      banner.textContent = `Hi ${details.name}, let's get personalised college suggestions for you.`;
+      banner.style.display = 'block';
+      document.getElementById('detailsSection') &&
+        (document.getElementById('detailsSection').style.display = 'none');
+      document.getElementById('predictorSection').style.display = 'block';
+    }
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      initBranchDropdown();
+
+      /* Score label fix */
+      document.querySelectorAll('input[name="method"]').forEach(r => {
+        r.addEventListener('change', () => {
+          const val = document.querySelector('input[name="method"]:checked').value;
+          const lab = document.getElementById('scoreLabel');
+          const inp = document.getElementById('score');
+          if (val === "Rank") {
+            lab.textContent = 'Enter Rank';
+            inp.placeholder = 'e.g., 32450';
+          } else {
+            lab.textContent = 'Enter Percentile';
+            inp.placeholder = 'e.g., 96.4';
+          }
+        });
+      });
+
+      // With this:
+      const session = getSession();
+      if (session && session.name) {
+        showPredictor(session);
+      } else {
+        document.getElementById('predictorSection').style.display = 'block';
+        document.getElementById('helloBanner').style.display = 'none';
+      }
+
+      document.getElementById('editDetailsBtn').style.display = 'none';
+    });
+
+  </script>
+</body>
+
+
+</html>
