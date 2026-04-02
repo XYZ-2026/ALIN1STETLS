@@ -709,7 +709,8 @@
       var btn = document.getElementById('regBtn');
       btn.disabled = true; btn.textContent = 'Creating account…';
 
-      var res = await authApi('register', { name: name, email: email, phone: phone, state: state, city: city, password: pwd, percentile: 0, rank: 0 });
+      // FIXED
+      var res = await authApi('register', { name: name, email: email, phone: phone, state: state, city: city, password: pwd });
       btn.disabled = false; btn.textContent = 'Create Account →';
 
       if (!res.ok) return showErr('rErr', res.error || 'Registration failed.');

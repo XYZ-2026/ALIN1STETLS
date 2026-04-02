@@ -17,7 +17,7 @@ var AUTH_CONFIG = {
   SESSION_KEY: 'cs_unified_session',
   THEME_KEY: 'cs_theme',
   AUTH_PAGE: 'auth.html',
-  HOME_PAGE: 'home.html'
+  HOME_PAGE: 'index.html'
 };
 
 /* ══════════════════════════════════════════
