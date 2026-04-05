@@ -463,6 +463,16 @@
     .chip-remove:hover {
       color: var(--brand-600);
     }
+
+    /* Responsive Topbar */
+    @media (max-width: 600px) {
+      .brand-text {
+        display: none;
+      }
+      .topbar-inner {
+        padding: 10px 14px;
+      }
+    }
   </style>
 </head>
 
@@ -470,18 +480,20 @@
 
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand-badge">
-        <div class="badge">CS</div>
-        <div>All India Rank College Predictor</div>
-      </div>
+      <a href="index.html" style="text-decoration:none; color:var(--ink); display:flex; align-items:center;">
+        <div class="brand-badge">
+          <div class="badge">CS</div>
+          <div class="brand-text">All India Rank Predictor</div>
+        </div>
+      </a>
       <div class="topbar-right">
+        <a class="site-link" href="index.html" style="font-size:13px; padding:7px 12px; border-radius:9px;">← Dashboard</a>
         <button class="theme-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle dark mode">
           <svg id="themeIcon" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
           </svg>
         </button>
-        <a class="site-link" href="#" onclick="return false;">Concept Simplified</a>
       </div>
     </div>
   </header>

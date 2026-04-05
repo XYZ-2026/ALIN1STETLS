@@ -166,6 +166,12 @@
       font-family: 'Outfit', sans-serif
     }
 
+    @media (max-width: 480px) {
+      .brand-name {
+        display: none;
+      }
+    }
+
     .topbar-right {
       margin-left: auto;
       display: flex;
@@ -949,13 +955,30 @@
       }
     }
 
-    @media(max-width:400px) {
-      .topbar-inner {
-        padding: 0 12px
-      }
-
+    @media(max-width:600px) {
       .brand-name {
         display: none
+      }
+    }
+
+    @media(max-width:480px) {
+      .nav-btn .back-text {
+        display: none;
+      }
+    }
+
+    @media(max-width:400px) {
+      .topbar-right {
+        gap: 5px;
+      }
+      #authArea span {
+        display: none;
+      }
+      .nav-btn {
+        padding: 7px 10px;
+      }
+      .topbar-inner {
+        padding: 13px 10px;
       }
     }
   </style>
@@ -971,6 +994,7 @@
         <div class="brand-name">College Simplified<span>MHT-CET Cutoff Checker</span></div>
       </div>
       <div class="topbar-right">
+        <a class="nav-btn" href="index.html" style="text-decoration:none; color:var(--muted); border:1.5px solid var(--stroke); padding:7px 12px; border-radius:9px; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px;">← <span class="back-text">Dashboard</span></a>
         <label class="toggle-wrap" title="Toggle theme">
           <input type="checkbox" id="themeToggle">
           <div class="toggle-track"><span>&#9728;</span><span>&#127769;</span></div>

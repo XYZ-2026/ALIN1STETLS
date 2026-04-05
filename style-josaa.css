@@ -1477,7 +1477,7 @@ tr:hover td       { background: var(--row-hover); }
   .user-name { display: none; }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .brand-name { display: none; }
   .btn    { padding: 9px 12px; font-size: 12px; }
   .btn-sm { padding: 6px 10px; font-size: 11px; }

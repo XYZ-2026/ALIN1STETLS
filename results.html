@@ -107,6 +107,12 @@
       box-shadow: 0 4px 14px rgba(230, 64, 58, .3);
     }
 
+    @media (max-width: 480px) {
+      .brand-badge span {
+        display: none;
+      }
+    }
+
     .topbar-actions {
       display: flex;
       align-items: center;
@@ -520,7 +526,7 @@
             <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
           </svg>
         </button>
-        <a class="back-btn" href="air.html">← Back to Predictor</a>
+        <a class="back-btn" href="index.html" style="margin-left: 10px;">← Back to Dashboard</a>
       </div>
     </div>
   </header>

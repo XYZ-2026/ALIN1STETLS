@@ -442,17 +442,30 @@
       color: var(--ink2)
     }
 
-    @media(max-width:640px) {
-      .wrap {
-        padding: 20px 14px 40px
+    @media(max-width:600px) {
+      .brand-name {
+        display: none;
       }
+    }
 
-      .page-hero {
-        padding: 20px 18px
+    @media(max-width:480px) {
+      .back-text {
+        display: none;
       }
+    }
 
-      .result-grid {
-        grid-template-columns: 1fr
+    @media(max-width:400px) {
+      .topbar-right {
+        gap: 5px;
+      }
+      #authArea span {
+        display: none;
+      }
+      .back-btn {
+        padding: 7px 10px;
+      }
+      .topbar-inner {
+        padding: 13px 10px;
       }
     }
   </style>
@@ -467,7 +480,7 @@
       </a>
       <div class="topbar-right">
         <div id="authArea"></div>
-        <a class="back-btn" href="index.html">← Back to Hub</a>
+        <a class="back-btn" href="index.html">← <span class="back-text">Back to Dashboard</span></a>
         <label class="toggle-wrap" title="Toggle dark mode">
           <input type="checkbox" id="themeToggle">
           <div class="toggle-track"><span>☀</span><span>🌙</span></div>
