@@ -13,7 +13,7 @@
 'use strict';
 
 var AUTH_CONFIG = {
-  API_URL: 'https://script.google.com/macros/s/AKfycbxklMQ-UJ6juQVh9KWXM-f0XGiRuMbiEoOzg0avvHFL34C_ZCg7CRAFsvGzD0_CQpCx/exec',
+  API_URL: 'https://script.google.com/macros/s/AKfycbwsDORX0QxDfZRNVJ61YV2KxvlMYgaAvVYwD4Y8lIsGGme7eY_2rydyLi8-UwfhKSmC/exec',
   SESSION_KEY: 'cs_unified_session',
   THEME_KEY: 'cs_theme',
   AUTH_PAGE: 'auth.html',
