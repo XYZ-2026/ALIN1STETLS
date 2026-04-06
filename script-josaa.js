@@ -23,6 +23,23 @@ let currentPage = 'home';
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   loadJosaaData();
+
+  // Check for 'rank' in URL to pre-fill predictor
+  const params = new URLSearchParams(window.location.search);
+  const rank = params.get('rank');
+  if (rank) {
+    const inRank = document.getElementById('inRank');
+    if (inRank) {
+      inRank.value = rank;
+      // Show predictor page
+      showPage('predictor');
+      // Scroll to form
+      setTimeout(() => {
+        const card = document.querySelector('.predictor-card');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+  }
 });
 
 /* ══════════════════════════════════════════════════════════════

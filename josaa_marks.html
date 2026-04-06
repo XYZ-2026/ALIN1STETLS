@@ -586,6 +586,7 @@
           <div class="rg-val small" id="rgShift">—</div>
         </div>
       </div>
+      <button class="btn btn-primary" onclick="redirectToRank()" style="margin-top: 22px; background: #e6403a; border-color: #e6403a; box-shadow: 0 4px 14px rgba(230, 64, 58, 0.3);">📊 Next: Predict Rank from Percentile</button>
     </div>
 
     <div class="disclaimer">
@@ -593,7 +594,11 @@
     </div>
   </div>
 
+  <script src="shared_auth.js"></script>
   <script>
+    // Initialize Auth
+    initAuth();
+
     // ── Theme toggle ──
     (function () {
       const toggle = document.getElementById('themeToggle');
@@ -721,6 +726,14 @@
     document.getElementById('inMarks').addEventListener('keydown', e => {
       if (e.key === 'Enter') predict();
     });
+
+    function redirectToRank() {
+      const pctTxt = document.getElementById('resPercentile').textContent;
+      const pct = parseFloat(pctTxt.replace('%', ''));
+      if (!isNaN(pct)) {
+        window.location.href = `josaa_rank.html?percentile=${pct}`;
+      }
+    }
   </script>
 </body>
 

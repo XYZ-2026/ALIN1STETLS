@@ -532,6 +532,7 @@
             <div class="rg-val" id="rgCat" style="font-size:12px">General</div>
           </div>
         </div>
+        <button class="btn btn-primary" onclick="redirectToColleges()" style="margin-top: 24px; background: #2563eb; border-color: #2563eb; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);">🎓 Next: Predict Colleges from Rank</button>
       </div>
 
 
@@ -593,6 +594,32 @@
         var rc = document.getElementById('resultCard');
         rc.classList.remove('show'); void rc.offsetWidth; rc.classList.add('show');
       }
+
+      function redirectToColleges() {
+        const rankTxt = document.getElementById('resRank').textContent;
+        const rank = parseInt(rankTxt.replace(/,/g, '').replace(/[^0-9]/g, ''));
+        if (!isNaN(rank)) {
+          window.location.href = `josaa.html?rank=${rank}`;
+        }
+      }
+
+      // Handle URL parameters
+      window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const pct = params.get('percentile');
+        if (pct) {
+          document.getElementById('inPercentile').value = pct;
+          // Wait for rankData to load before calculating
+          let attempts = 0;
+          const checkData = setInterval(() => {
+            if (window.rankData && window.rankData.length > 0) {
+              calcRank();
+              clearInterval(checkData);
+            }
+            if (++attempts > 50) clearInterval(checkData); // Timeout after 5s
+          }, 100);
+        }
+      });
     } // end initAuth
   </script>
 </body>
