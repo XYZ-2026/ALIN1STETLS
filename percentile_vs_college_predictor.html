@@ -176,7 +176,9 @@
         }
 
         @media (max-width: 480px) {
-            .brand-title, .brand-sub {
+
+            .brand-title,
+            .brand-sub {
                 display: none;
             }
         }
@@ -364,6 +366,7 @@
             outline: none;
             transition: border-color .2s, box-shadow .2s;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .field input::placeholder {
@@ -492,6 +495,30 @@
             border: 1.5px solid var(--border);
             text-align: center;
             box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s, border-color .15s, background .15s;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-box.active {
+            background: var(--surface2);
+            border-width: 2px;
+        }
+
+        .s-green.active {
+            border-color: var(--green);
+        }
+
+        .s-yellow.active {
+            border-color: var(--yellow);
+        }
+
+        .s-orange.active {
+            border-color: var(--orange);
         }
 
         .summary-count {
@@ -1036,9 +1063,12 @@
                 <div class="brand-sub">AI Seat Eligibility Checker</div>
             </div>
         </div>
-        <div class="topbar-tag" style="display: flex; align-items: center; gap: 10px; background: transparent; border: none;">
+        <div class="topbar-tag"
+            style="display: flex; align-items: center; gap: 10px; background: transparent; border: none;">
             <div id="authArea"></div>
-            <a class="nav-btn" href="index.html" style="text-decoration:none; color:var(--brand); border:1px solid var(--border2); padding:5px 14px; border-radius:999px; font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">← Dashboard</a>
+            <a class="nav-btn" href="index.html"
+                style="text-decoration:none; color:var(--brand); border:1px solid var(--border2); padding:5px 14px; border-radius:999px; font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">←
+                Dashboard</a>
         </div>
     </header>
 
@@ -1100,23 +1130,29 @@
             <div id="scoreDisplay" class="score-display"></div>
 
             <div class="result-summary">
-                <div class="summary-box s-green">
+                <div class="summary-box s-green" id="boxHigh" onclick="setProbFilter('high')">
                     <div class="summary-count" id="cntHigh">0</div>
-                    <div class="summary-label">✅ High Probability</div>
+                    <div class="summary-label">High Probability</div>
                 </div>
-                <div class="summary-box s-yellow">
+                <div class="summary-box s-yellow" id="boxMed" onclick="setProbFilter('med')">
                     <div class="summary-count" id="cntMed">0</div>
-                    <div class="summary-label">⚡ Medium Probability</div>
+                    <div class="summary-label">Medium Probability</div>
                 </div>
-                <div class="summary-box s-orange">
+                <div class="summary-box s-orange" id="boxLow" onclick="setProbFilter('low')">
                     <div class="summary-count" id="cntLow">0</div>
-                    <div class="summary-label">🎯 Low Probability</div>
+                    <div class="summary-label">Low Probability</div>
                 </div>
             </div>
 
             <!-- FILTER BAR -->
             <div class="filter-bar">
                 <label>Filter</label>
+                <select class="filter-sel" id="filterProb" onchange="renderFiltered()">
+                    <option value="">All Probabilities</option>
+                    <option value="high">High Probability</option>
+                    <option value="med">Medium Probability</option>
+                    <option value="low">Low Probability</option>
+                </select>
                 <select class="filter-sel" id="filterRegion" onchange="renderFiltered()">
                     <option value="">All Regions</option>
                 </select>
@@ -1330,6 +1366,13 @@
         function renderFiltered() {
             var fRegion = document.getElementById('filterRegion').value;
             var fBranch = document.getElementById('filterBranch').value;
+            var fProb = document.getElementById('filterProb').value;
+
+            // Update summary box active states
+            document.querySelectorAll('.summary-box').forEach(function (b) { b.classList.remove('active'); });
+            if (fProb === 'high') document.getElementById('boxHigh').classList.add('active');
+            if (fProb === 'med') document.getElementById('boxMed').classList.add('active');
+            if (fProb === 'low') document.getElementById('boxLow').classList.add('active');
 
             function filter(arr) {
                 return arr.filter(function (item) {
@@ -1354,9 +1397,17 @@
             renderTier('cardsMed', m, 'med');
             renderTier('cardsLow', l, 'low');
 
-            document.getElementById('tierHigh').style.display = (h.length || !fRegion && !fBranch) ? '' : 'none';
-            document.getElementById('tierMed').style.display = (m.length || !fRegion && !fBranch) ? '' : 'none';
-            document.getElementById('tierLow').style.display = (l.length || !fRegion && !fBranch) ? '' : 'none';
+            // Toggle visibility by Prob filter
+            document.getElementById('tierHigh').style.display = (h.length && (!fProb || fProb === 'high')) ? '' : 'none';
+            document.getElementById('tierMed').style.display = (m.length && (!fProb || fProb === 'med')) ? '' : 'none';
+            document.getElementById('tierLow').style.display = (l.length && (!fProb || fProb === 'low')) ? '' : 'none';
+        }
+
+        function setProbFilter(tier) {
+            var sel = document.getElementById('filterProb');
+            if (sel.value === tier) sel.value = ''; // toggle off
+            else sel.value = tier;
+            renderFiltered();
         }
 
         /* ── RENDER TIER ── */
